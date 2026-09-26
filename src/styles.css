@@ -188,7 +188,8 @@ body[data-dock="on"] [data-bottom-nav] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-bottom-nav] {
+  [data-bottom-nav],
+  [data-purchase-dock] {
     transition: none;
   }
 }

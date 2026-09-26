@@ -434,6 +434,7 @@ function PurchaseDock({
   if (!mounted) return null;
   return createPortal(
     <div
+      data-purchase-dock
        className={cn(
          "fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] border-t border-border bg-card p-4 transition-transform duration-200 motion-reduce:transition-none",
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0",
