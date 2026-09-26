@@ -22,12 +22,12 @@ export function SiteHeader() {
         <Logo />
         <div className="flex min-w-0 items-center gap-1">
           <button className="flex min-w-0 items-center gap-1 rounded-full bg-surface-soft px-3 py-1.5 text-[12px] font-semibold active:bg-primary-container">
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
-            <span className="truncate">560103 · Bengaluru</span>
-            <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
+            <MapPin className="h-[22px] w-[22px] shrink-0 text-primary" />
+            <span className="whitespace-nowrap"><span className="loc-city">Bengaluru </span>560103</span>
+            <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
           </button>
           <Link to="/cart" aria-label="Cart" className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full active:bg-surface-soft">
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-[22px] w-[22px]" />
             {count > 0 ? (
               <span className="absolute right-1 top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
                 {count}
@@ -48,36 +48,43 @@ const mobileDestinations = [
   { to: "/account", label: "Account", icon: User },
 ] as const;
 
+const ORDERS_BADGE = 1; // orders currently out for delivery
+
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <nav data-bottom-nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] pb-4">
-      <div className="container-page">
-        <div className="pointer-events-auto mx-auto flex max-w-md items-center justify-between gap-1 rounded-full border border-border bg-card/95 p-1.5 shadow-nav backdrop-blur">
-          {mobileDestinations.map((destination) => {
-            const active =
-              destination.to === "/" ? pathname === "/" : pathname.startsWith(destination.to);
-            const Icon = destination.icon;
-            return (
-              <Link
-                key={destination.to}
-                to={destination.to}
-                search={destination.to === "/search" ? { q: "" } : {}}
-                style={{ flexGrow: active ? 1.45 : 1, flexBasis: 0, WebkitTapHighlightColor: "transparent" }}
-                className={cn(
-                  "flex min-w-0 flex-col items-center gap-0.5 rounded-full px-1 py-2 text-[11px] font-semibold transition-[flex-grow,background-color,color] duration-200",
-                  active ? "bg-primary text-primary-foreground" : "text-muted-foreground",
-                )}
-              >
-                <Icon className="h-[18px] w-[18px]" />
-                {destination.label}
-              </Link>
-            );
-          })}
-        </div>
+    <nav data-bottom-nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] px-4 pb-[calc(12px+env(safe-area-inset-bottom))]">
+      <div className="nav-dock pointer-events-auto flex h-16 items-center gap-1 rounded-[32px] p-1.5">
+        {mobileDestinations.map((destination) => {
+          const active =
+            destination.to === "/" ? pathname === "/" : pathname.startsWith(destination.to);
+          const Icon = destination.icon;
+          return (
+            <Link
+              key={destination.to}
+              to={destination.to}
+              search={destination.to === "/search" ? { q: "" } : {}}
+              aria-current={active ? "page" : undefined}
+              style={{ flexGrow: active ? 1.45 : 1, flexBasis: 0 }}
+              className={cn(
+                "nav-item flex h-[52px] min-w-0 flex-col items-center justify-center gap-[3px] rounded-[26px] text-[10px] leading-[13px]",
+                active ? "bg-primary font-bold text-primary-foreground" : "font-semibold text-muted-foreground",
+              )}
+            >
+              <span className="relative grid h-[22px] w-[22px] place-items-center">
+                <Icon className="h-[22px] w-[22px]" />
+                {destination.to === "/orders" && ORDERS_BADGE > 0 ? (
+                  <span className="absolute -right-1.5 -top-1 grid h-[15px] min-w-[15px] place-items-center rounded-full bg-primary px-1 text-[9px] font-bold leading-none text-primary-foreground ring-2 ring-card">
+                    {ORDERS_BADGE}
+                  </span>
+                ) : null}
+              </span>
+              {destination.label}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
 }
-

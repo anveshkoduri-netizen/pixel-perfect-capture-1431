@@ -45,9 +45,9 @@ export function PillButton({ className, variant = "primary", size = "md", ...pro
     <button
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-[background-color,box-shadow,transform] disabled:pointer-events-none disabled:opacity-45 active:scale-[0.985]",
-        size === "sm" && "h-9 px-4 text-[13px]",
-        size === "md" && "h-11 px-5 text-sm",
-        size === "lg" && "h-12 px-7 text-[15px]",
+        size === "sm" && "h-9 px-4 text-[13px] [&_svg]:h-[18px] [&_svg]:w-[18px]",
+        size === "md" && "h-11 px-5 text-sm [&_svg]:h-[18px] [&_svg]:w-[18px]",
+        size === "lg" && "h-12 px-7 text-[15px] [&_svg]:h-[18px] [&_svg]:w-[18px]",
         variant === "primary" && "bg-primary text-primary-foreground hover:bg-primary/92 shadow-[0_6px_18px_-10px_var(--primary)]",
         variant === "secondary" && "border border-border-strong bg-card text-foreground hover:bg-surface-soft",
         variant === "ghost" && "text-primary hover:bg-primary-container",
@@ -67,10 +67,8 @@ export function Chip({
   return (
     <button
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors",
-        selected
-          ? "border-primary bg-primary-container text-primary-container-foreground"
-          : "border-border bg-card text-muted-foreground hover:border-border-strong hover:text-foreground",
+        "chip inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-[14px] text-[13px] font-semibold transition-colors [&_svg]:h-3.5 [&_svg]:w-3.5",
+        selected ? "chip-selected" : "chip-default",
         className,
       )}
       {...props}
@@ -78,6 +76,10 @@ export function Chip({
       {children}
     </button>
   );
+}
+
+export function plural(n: number, word: string, pluralWord = `${word}s`) {
+  return `${n.toLocaleString("en-IN")} ${n === 1 ? word : pluralWord}`;
 }
 
 export function Badge({
@@ -118,13 +120,13 @@ export function SectionHeader({
   to?: string | undefined;
 }) {
   return (
-    <div className="mb-4 flex items-end justify-between gap-4">
+    <div className="mb-4 flex items-baseline justify-between gap-4">
       <div className="min-w-0">
         {eyebrow ? <p className="eyebrow mb-1">{eyebrow}</p> : null}
         <h2 className="truncate text-xl font-bold md:text-[22px]">{title}</h2>
       </div>
       {action && to ? (
-        <Link to={to} className="shrink-0 text-sm font-semibold text-primary hover:underline">
+        <Link to={to} className="shrink-0 text-[14px] font-semibold leading-none text-primary hover:underline">
           {action}
         </Link>
       ) : null}

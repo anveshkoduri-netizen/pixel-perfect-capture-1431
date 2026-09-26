@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { inr, productById } from "@/lib/skycart-data";
 import { DeliveryLine, ProductTile } from "@/components/skycart/ProductCard";
-import { EmptyState, PillButton, QuantityStepper } from "@/components/skycart/primitives";
+import { EmptyState, PillButton, QuantityStepper, plural } from "@/components/skycart/primitives";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -164,7 +164,7 @@ function CartPage() {
           <div className="min-w-0 flex-1">
             <p className="font-display text-lg font-extrabold leading-tight">{inr(totals.total)}</p>
             <p className="truncate text-[12px] text-muted-foreground">
-              {count} item{count === 1 ? "" : "s"} · incl. GST
+              {plural(count, "item")} · incl. GST
             </p>
           </div>
           <PillButton size="lg" onClick={() => navigate({ to: "/checkout" })}>

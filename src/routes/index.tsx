@@ -64,7 +64,7 @@ const frequent = pick([
 
 function CategoryStrip() {
   return (
-    <div className="grid grid-cols-4 gap-x-2 gap-y-3">
+    <div className="grid grid-cols-4 gap-x-3 gap-y-3">
       {homeCategories.map((slug) => {
         const category = categories.find((c) => c.slug === slug);
         if (!category) return null;
@@ -77,7 +77,7 @@ function CategoryStrip() {
             className="flex min-w-0 flex-col items-center gap-1.5 rounded-lg p-1 text-center"
           >
             <span className="grid h-12 w-12 place-items-center rounded-lg border border-border bg-card text-primary">
-              <Icon className="h-6 w-6" />
+              <Icon className="h-[26px] w-[26px]" />
             </span>
             <span className="line-clamp-2 w-full text-[11px] font-semibold leading-tight">{category.name}</span>
           </Link>
@@ -85,7 +85,7 @@ function CategoryStrip() {
       })}
       <Link to="/categories" className="flex min-w-0 flex-col items-center gap-1.5 rounded-lg p-1 text-center">
         <span className="grid h-12 w-12 place-items-center rounded-lg border border-border bg-primary-container text-primary">
-          <ArrowRight className="h-5 w-5" />
+          <ArrowRight className="h-[26px] w-[26px]" />
         </span>
         <span className="w-full text-[11px] font-semibold leading-tight">All {categories.length}</span>
       </Link>
@@ -117,7 +117,7 @@ function Home() {
     <div className="container-page pt-3">
       <p className="eyebrow">Industrial & business supplies</p>
       <div className="mt-2">
-        <SearchField placeholder="Search products, brands or specifications" showExamples />
+        <SearchField placeholder="Search products or specs" size="lg" showExamples />
       </div>
 
       <section className="mt-6">
