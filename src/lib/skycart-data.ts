@@ -85,6 +85,8 @@ export type Product = {
   glanceStats?: Array<{ value: string; label: string }> | undefined;
   /** Products sharing a variant group appear in one selector row on the PDP. */
   variant?: { group: string; axis: string; label: string } | undefined;
+  /** Reuse another product's photo until a dedicated one exists. */
+  imageOf?: string | undefined;
 };
 
 const p = (x: Product) => x;
@@ -151,6 +153,108 @@ function mcb(o: {
     variant: o.group ? { group: o.group, axis: "Poles", label: o.poles } : undefined,
   };
 }
+
+
+type Base = Pick<Product, "id" | "brand" | "price" | "mrp" | "rating" | "reviews" | "delivery" | "freeDelivery"> & { stock?: Product["stock"]; tags?: Product["tags"] };
+const base = (o: Base) => ({ ...o, stock: o.stock ?? ("in" as const), tags: o.tags ?? [] });
+
+function drill(o: Base & { model: string; volts: 12 | 18 | 36; motor: "Brushless" | "Brushed"; battery: "2 × 2.0 Ah" | "2 × 4.0 Ah" | "Bare tool"; torque: number; impact?: boolean }): Product {
+  const batteryType = o.battery === "Bare tool" ? "Bare tool" : `Li-ion ${o.battery.slice(4)}`;
+  const kind = o.impact ? "Impact Drill" : "Drill Driver";
+  return {
+    ...base(o),
+    name: `${o.volts}V Cordless ${kind} ${o.model}`,
+    category: "power-tools",
+    specLine: `${o.volts} V · ${o.motor} · ${o.battery} · ${o.torque} Nm`,
+    specs: [
+      { label: "Voltage", value: `${o.volts} V` },
+      { label: "Motor", value: o.motor },
+      { label: "Max torque", value: `${o.torque} Nm` },
+      { label: "Battery type", value: batteryType },
+      { label: "Chuck", value: o.volts === 12 ? "10 mm keyless" : "13 mm keyless" },
+      { label: "Battery", value: o.battery === "Bare tool" ? "Not included" : `${o.battery} Li-ion` },
+    ],
+    compatibility: [`${o.brand} ${o.volts}V battery platform`, "Hex and round shank bits"],
+    included: o.battery === "Bare tool" ? ["Drill body", "Belt clip"] : ["Drill body", `${o.battery} batteries`, "Charger", "Carry case"],
+    warranty: "1 year manufacturer warranty",
+    glance: [`${o.motor} motor`, `${o.torque} Nm max torque`, o.battery === "Bare tool" ? "Bare tool — uses your existing batteries" : "Batteries and charger included"],
+    imageOf: "bosch-gsb-18v-50",
+  };
+}
+
+function batten(o: Base & { model: string; kelvin: 3000 | 4000 | 6500; lumens: number }): Product {
+  return {
+    ...base(o),
+    name: `20W LED Batten ${o.model}, 4 ft ${o.kelvin === 3000 ? "Warm White" : o.kelvin === 4000 ? "Natural White" : "Cool Daylight"}`,
+    category: "lighting",
+    specLine: `20 W · ${o.lumens.toLocaleString("en-IN")} lm · ${o.kelvin} K · IP20`,
+    specs: [
+      { label: "Wattage", value: "20 W" },
+      { label: "Luminous flux", value: `${o.lumens.toLocaleString("en-IN")} lm` },
+      { label: "Colour temperature", value: `${o.kelvin} K` },
+      { label: "IP rating", value: "IP20" },
+      { label: "Length", value: "1,200 mm" },
+      { label: "Input", value: "140–270 V AC" },
+    ],
+    compatibility: ["Surface and ceiling mount", "Standard 4 ft batten brackets"],
+    included: ["Batten", "Mounting clips", "Screws"],
+    warranty: "2 year warranty",
+    glance: [`${o.lumens.toLocaleString("en-IN")} lm output`, "Wide voltage operation", "Surge protected driver"],
+    imageOf: "philips-20w-batten",
+  };
+}
+
+function pipe(o: Base & { material: "UPVC" | "CPVC"; length: "3 m" | "6 m" }): Product {
+  return {
+    ...base(o),
+    name: `25 mm ${o.material} Plumbing Pipe, ${o.length}`,
+    category: "plumbing",
+    specLine: `25 mm · ${o.material} · ${o.material === "CPVC" ? "SDR 11 · Hot & cold" : "Schedule 40"} · ${o.length}`,
+    unit: "per length",
+    specs: [
+      { label: "Diameter", value: "25 mm" },
+      { label: "Material", value: o.material },
+      { label: "Length", value: o.length },
+      { label: "Connection type", value: "Solvent weld" },
+      { label: "Pressure class", value: o.material === "CPVC" ? "SDR 11" : "Schedule 40" },
+      { label: "Standard", value: o.material === "CPVC" ? "IS 15778" : "IS 4985" },
+    ],
+    compatibility: [`25 mm ${o.material} solvent weld fittings`, `${o.material} solvent cement`],
+    included: [`1 × ${o.length} pipe`],
+    warranty: "Manufacturer defect replacement",
+    glance: [o.material === "CPVC" ? "Rated for hot and cold water" : "Cold water rated", "Lead-free", "Solvent weld jointing"],
+    imageOf: "supreme-25mm-pvc-pipe",
+  };
+}
+
+const d = { delivery: "Tomorrow", freeDelivery: true };
+const catalogueDepth: Product[] = [
+  drill({ id: "bosch-gsr-18v-55-bare", brand: "Bosch Professional", model: "GSR 18V-55", volts: 18, motor: "Brushless", battery: "Bare tool", torque: 55, price: 6299, mrp: 8499, rating: 4.7, reviews: 188, ...d }),
+  drill({ id: "makita-ddf485-18v", brand: "Makita", model: "DDF485", volts: 18, motor: "Brushless", battery: "2 × 2.0 Ah", torque: 50, price: 11490, mrp: 15900, rating: 4.8, reviews: 342, ...d, tags: ["bestseller"] }),
+  drill({ id: "makita-dhp453-18v", brand: "Makita", model: "DHP453", volts: 18, motor: "Brushed", battery: "2 × 2.0 Ah", torque: 42, impact: true, price: 9290, mrp: 12400, rating: 4.6, reviews: 211, delivery: "In 2 days", freeDelivery: true }),
+  drill({ id: "dewalt-dcd796-18v", brand: "DeWalt", model: "DCD796", volts: 18, motor: "Brushless", battery: "2 × 4.0 Ah", torque: 70, impact: true, price: 16990, mrp: 22500, rating: 4.8, reviews: 157, ...d, tags: ["recommended"] }),
+  drill({ id: "stanley-scd711-18v", brand: "Stanley", model: "SCD711", volts: 18, motor: "Brushed", battery: "2 × 2.0 Ah", torque: 44, price: 5499, mrp: 7999, rating: 4.4, reviews: 523, delivery: "Tomorrow", freeDelivery: false, tags: ["deal"] }),
+  drill({ id: "blackdecker-bcd700-18v", brand: "Black+Decker", model: "BCD700", volts: 18, motor: "Brushed", battery: "2 × 2.0 Ah", torque: 40, price: 4799, mrp: 6999, rating: 4.3, reviews: 614, delivery: "In 2 days", freeDelivery: false }),
+  drill({ id: "hitachi-ds18dd-18v", brand: "Hitachi", model: "DS18DD", volts: 18, motor: "Brushed", battery: "2 × 2.0 Ah", torque: 46, price: 7390, mrp: 9800, rating: 4.5, reviews: 98, ...d, stock: "low" }),
+  drill({ id: "dewalt-dcd777-18v-bare", brand: "DeWalt", model: "DCD777", volts: 18, motor: "Brushless", battery: "Bare tool", torque: 65, price: 7990, mrp: 10500, rating: 4.6, reviews: 73, delivery: "In 3 days", freeDelivery: true }),
+  drill({ id: "bosch-gsr-12v-30", brand: "Bosch Professional", model: "GSR 12V-30", volts: 12, motor: "Brushless", battery: "2 × 2.0 Ah", torque: 30, price: 7499, mrp: 9999, rating: 4.7, reviews: 204, ...d }),
+  drill({ id: "makita-df333d-12v", brand: "Makita", model: "DF333D", volts: 12, motor: "Brushed", battery: "2 × 2.0 Ah", torque: 30, price: 6290, mrp: 8200, rating: 4.5, reviews: 167, delivery: "In 2 days", freeDelivery: true }),
+  drill({ id: "dewalt-dcd701-12v", brand: "DeWalt", model: "DCD701", volts: 12, motor: "Brushless", battery: "2 × 2.0 Ah", torque: 57, price: 9490, mrp: 12900, rating: 4.6, reviews: 88, ...d }),
+  drill({ id: "bosch-gsb-36v-bare", brand: "Bosch Professional", model: "GSB 36V", volts: 36, motor: "Brushless", battery: "Bare tool", torque: 68, impact: true, price: 18990, mrp: 24900, rating: 4.7, reviews: 41, delivery: "In 3 days", freeDelivery: true }),
+  drill({ id: "hitachi-ds36da-36v", brand: "Hitachi", model: "DS36DA", volts: 36, motor: "Brushless", battery: "2 × 4.0 Ah", torque: 70, price: 24500, mrp: 31000, rating: 4.6, reviews: 26, delivery: "In 3 days", freeDelivery: true, stock: "low" }),
+  batten({ id: "philips-20w-batten-4000k", brand: "Philips", model: "Astra Line", kelvin: 4000, lumens: 2000, price: 679, mrp: 999, rating: 4.5, reviews: 640, ...d }),
+  batten({ id: "syska-20w-batten", brand: "Syska", model: "T5 Slim", kelvin: 6500, lumens: 1900, price: 449, mrp: 799, rating: 4.3, reviews: 1180, delivery: "Tomorrow", freeDelivery: false, tags: ["deal"] }),
+  batten({ id: "syska-20w-batten-3000k", brand: "Syska", model: "T5 Slim", kelvin: 3000, lumens: 1800, price: 459, mrp: 799, rating: 4.2, reviews: 312, delivery: "In 2 days", freeDelivery: false }),
+  batten({ id: "wipro-20w-batten", brand: "Wipro", model: "Garnet", kelvin: 6500, lumens: 2000, price: 529, mrp: 890, rating: 4.4, reviews: 905, ...d }),
+  batten({ id: "wipro-20w-batten-4000k", brand: "Wipro", model: "Garnet", kelvin: 4000, lumens: 1950, price: 539, mrp: 890, rating: 4.4, reviews: 221, delivery: "In 2 days", freeDelivery: true }),
+  batten({ id: "havells-20w-batten", brand: "Havells", model: "Pearl", kelvin: 6500, lumens: 2200, price: 599, mrp: 1050, rating: 4.5, reviews: 734, ...d, tags: ["recommended"] }),
+  pipe({ id: "astral-25mm-cpvc-pipe", brand: "Astral", material: "CPVC", length: "3 m", price: 412, mrp: 520, rating: 4.6, reviews: 388, ...d }),
+  pipe({ id: "astral-25mm-upvc-pipe", brand: "Astral", material: "UPVC", length: "6 m", price: 405, mrp: 510, rating: 4.5, reviews: 196, delivery: "In 2 days", freeDelivery: false }),
+  pipe({ id: "finolex-25mm-upvc-pipe", brand: "Finolex", material: "UPVC", length: "3 m", price: 209, mrp: 270, rating: 4.4, reviews: 251, delivery: "In 2 days", freeDelivery: false }),
+  pipe({ id: "finolex-25mm-cpvc-pipe", brand: "Finolex", material: "CPVC", length: "3 m", price: 398, mrp: 505, rating: 4.5, reviews: 144, ...d }),
+  pipe({ id: "ashirvad-25mm-cpvc-pipe", brand: "Ashirvad", material: "CPVC", length: "3 m", price: 425, mrp: 540, rating: 4.7, reviews: 302, ...d, tags: ["bestseller"] }),
+  pipe({ id: "supreme-25mm-cpvc-pipe", brand: "Supreme", material: "CPVC", length: "6 m", price: 789, mrp: 990, rating: 4.4, reviews: 87, delivery: "In 3 days", freeDelivery: true }),
+];
 
 export const products: Product[] = [
   p({
@@ -796,6 +900,7 @@ export const products: Product[] = [
     warranty: "Not applicable",
     glance: ["Corrosion resistant SS304", "Consistent thread quality", "Bulk pack"],
   }),
+  ...catalogueDepth,
 ];
 
 export const productById = (id: string) => products.find((x) => x.id === id);
@@ -815,6 +920,12 @@ export const brands = [
   "Godrej",
   "Schneider Electric",
   "L&T",
+  "DeWalt",
+  "Hitachi",
+  "Syska",
+  "Wipro",
+  "Finolex",
+  "Ashirvad",
 ];
 
 export const discount = (product: Product) => Math.round(((product.mrp - product.price) / product.mrp) * 100);
@@ -824,14 +935,12 @@ export const inr = (n: number) =>
 
 export const filterGroupsByCategory: Record<string, Array<{ label: string; options: string[] }>> = {
   "power-tools": [
-    { label: "Brand", options: ["Bosch Professional", "Makita", "DeWalt", "Stanley"] },
-    { label: "Tool type", options: ["Drill", "Impact driver", "Angle grinder", "Rotary hammer"] },
-    { label: "Voltage", options: ["12 V", "18 V", "36 V", "Corded"] },
+    { label: "Brand", options: ["Bosch Professional", "Makita", "DeWalt", "Stanley", "Black+Decker", "Hitachi"] },
+    { label: "Product type", options: ["Drill", "Impact drill", "Angle grinder", "Rotary hammer"] },
+    { label: "Voltage", options: ["12 V", "18 V", "36 V"] },
+    { label: "Motor", options: ["Brushless", "Brushed"] },
     { label: "Battery type", options: ["Li-ion 2.0 Ah", "Li-ion 4.0 Ah", "Bare tool"] },
     { label: "Torque", options: ["Up to 40 Nm", "40–60 Nm", "Above 60 Nm"] },
-    { label: "Power", options: ["Up to 700 W", "700–1000 W", "Above 1000 W"] },
-    { label: "RPM", options: ["Up to 2,000", "2,000–8,000", "Above 8,000"] },
-    { label: "Application", options: ["Masonry", "Metal", "Wood"] },
   ],
   electrical: [
     { label: "Brand", options: ["Havells", "Legrand", "Schneider Electric", "L&T", "Anchor"] },
@@ -845,7 +954,7 @@ export const filterGroupsByCategory: Record<string, Array<{ label: string; optio
   ],
   lighting: [
     { label: "Brand", options: ["Philips", "Wipro", "Syska", "Havells"] },
-    { label: "Product type", options: ["Batten", "Panel", "Floodlight", "Bulb"] },
+    { label: "Product type", options: ["Batten", "Floodlight", "Panel", "Bulb"] },
     { label: "Wattage", options: ["9 W", "20 W", "50 W", "100 W"] },
     { label: "Lumens", options: ["Up to 1,000", "1,000–3,000", "Above 3,000"] },
     { label: "Colour temperature", options: ["3000 K", "4000 K", "6500 K"] },
@@ -861,7 +970,7 @@ export const filterGroupsByCategory: Record<string, Array<{ label: string; optio
     { label: "Insulation", options: ["PVC", "FR PVC", "XLPE"] },
   ],
   plumbing: [
-    { label: "Brand", options: ["Supreme", "Astral", "Ashirvad", "Prince"] },
+    { label: "Brand", options: ["Supreme", "Astral", "Finolex", "Ashirvad"] },
     { label: "Product type", options: ["Pipe", "Fitting", "Valve", "Tank connector"] },
     { label: "Diameter", options: ["20 mm", "25 mm", "40 mm", "63 mm"] },
     { label: "Material", options: ["UPVC", "CPVC", "PVC", "Brass"] },
@@ -920,7 +1029,21 @@ export function productMatchesFacet(product: Product, group: string, option: str
     if (option === "Delivery tomorrow") return product.delivery === "Tomorrow";
     return product.freeDelivery;
   }
-  if (group === "Product type" || group === "Tool type" || group === "Cable type") {
+  const num = (label: string) => Number.parseFloat((specs.find((x) => x.label === label)?.value ?? "").replace(/,/g, ""));
+  if (group === "Torque") {
+    const t = num("Max torque");
+    if (Number.isNaN(t)) return false;
+    return option.startsWith("Up to") ? t <= 40 : option.startsWith("Above") ? t > 60 : t > 40 && t <= 60;
+  }
+  if (group === "Lumens") {
+    const l = num("Luminous flux");
+    if (Number.isNaN(l)) return false;
+    return option.startsWith("Up to") ? l <= 1000 : option.startsWith("Above") ? l > 3000 : l > 1000 && l <= 3000;
+  }
+  if (group === "Connection type") return specMatches(["Connection type", "Connection"]);
+  if (group === "Product type" && option === "Drill") return /\bdrill\b/i.test(product.name) && !/impact/i.test(product.name);
+  if (group === "Product type" && option === "Impact drill") return /impact drill/i.test(product.name);
+  if (group === "Product type" || group === "Cable type") {
     return new RegExp(`\\b${option.toLowerCase()}\\b`).test(text) ||
       (option === "Drill" && /drill/.test(text)) || (option === "Wire" && /wire|cable/.test(text));
   }
