@@ -6,7 +6,7 @@ import { SearchField } from "@/components/skycart/SearchField";
 import { ResultsView } from "@/components/skycart/ResultsView";
 import { EmptyState, PillButton, categoryIcons } from "@/components/skycart/primitives";
 import { interpret, relaxedResults, searchProducts } from "@/lib/search";
-import { categories, categoryBySlug, products } from "@/lib/skycart-data";
+import { categories, categoryBySlug } from "@/lib/skycart-data";
 
 export const Route = createFileRoute("/search")({
   validateSearch: z.object({ q: z.string().optional().default("") }),
@@ -181,7 +181,7 @@ function SearchPage() {
                 All {category.name} · {category.count.toLocaleString("en-IN")} products
               </PillButton>
             ) : null}
-            <PillButton onClick={() => navigate({ to: "/search", search: { q: products[0].brand } })}>
+            <PillButton onClick={() => navigate({ to: "/search", search: { q: q.split(" ").slice(-1).join(" ") } })}>
               Closest matches
             </PillButton>
           </EmptyState>
