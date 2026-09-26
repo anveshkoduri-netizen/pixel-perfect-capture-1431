@@ -1041,7 +1041,7 @@ export function productMatchesFacet(product: Product, group: string, option: str
     return option.startsWith("Up to") ? l <= 1000 : option.startsWith("Above") ? l > 3000 : l > 1000 && l <= 3000;
   }
   if (group === "Connection type") return specMatches(["Connection type", "Connection"]);
-  if (group === "Product type" && option === "Drill") return /\bdrill\b/i.test(product.name) && !/impact/i.test(product.name);
+  if (group === "Product type" && option === "Drill") return /\bdrill\b/i.test(product.name);
   if (group === "Product type" && option === "Impact drill") return /impact drill/i.test(product.name);
   if (group === "Product type" || group === "Cable type") {
     return new RegExp(`\\b${option.toLowerCase()}\\b`).test(text) ||
