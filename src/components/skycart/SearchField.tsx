@@ -66,7 +66,7 @@ export function SearchField({
           aria-label="Search SKYCART"
           className={cn(
             "min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground",
-            size === "lg" ? "text-base" : "text-sm",
+            size === "lg" ? "text-[15px]" : "text-sm",
           )}
         />
         {query ? (
@@ -83,7 +83,7 @@ export function SearchField({
           type="submit"
           className={cn(
             "shrink-0 rounded-full bg-primary font-semibold text-primary-foreground transition-colors hover:bg-primary/92",
-            size === "lg" ? "h-10 px-5 text-[14px]" : "h-8 px-4 text-[13px]",
+            size === "lg" ? "h-10 px-4 text-[14px]" : "h-8 px-4 text-[13px]",
           )}
         >
           Search
