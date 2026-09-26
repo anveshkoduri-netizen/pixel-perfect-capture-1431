@@ -74,7 +74,9 @@ export function Chip({
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+    </button>
   );
 }
 
