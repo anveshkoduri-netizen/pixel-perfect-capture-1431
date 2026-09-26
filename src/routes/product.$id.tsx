@@ -424,10 +424,10 @@ function PurchaseDock({
   }, [product.id]);
   // Swap the bottom nav out while the purchase bar is visible.
   useEffect(() => {
-    if (show) document.body.dataset.dock = "on";
-    else delete document.body.dataset.dock;
+    if (show) document.body.dataset["dock"] = "on";
+    else delete document.body.dataset["dock"];
     return () => {
-      delete document.body.dataset.dock;
+      delete document.body.dataset["dock"];
     };
   }, [show]);
   if (!mounted) return null;
