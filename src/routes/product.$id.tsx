@@ -343,13 +343,13 @@ function PurchaseDock({
 }) {
   const [show, setShow] = useState(false);
   useEffect(() => {
-    const el = document.querySelector("[data-purchase-cta]");
-    if (!el) return;
-    const io = new IntersectionObserver(([entry]) => {
-      if (entry) setShow(!entry.isIntersecting && entry.boundingClientRect.top < 0);
-    });
-    io.observe(el);
-    return () => io.disconnect();
+    const onScroll = () => {
+      const el = document.querySelector("[data-purchase-cta]");
+      setShow(!!el && el.getBoundingClientRect().bottom < 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, [product.id]);
   return (
     <div
