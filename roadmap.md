@@ -1,4 +1,4 @@
-- [ ] Swap product bottom navigation for a 200ms, reduced-motion-aware purchase bar after the main Add to cart button leaves view; restore nav when it returns.
-- [ ] Show eight complete category tiles and an All 14 tile in a four-column home grid at phone widths.
-- [ ] Use catalogue display names in department breadcrumbs.
-- [ ] Verify the interactions and layout at 360, 390, and 430px.
+- [x] Swap product bottom navigation for a 200ms, reduced-motion-aware purchase bar after the main Add to cart button leaves view; restore nav when it returns.
+- [x] Show eight complete category tiles and an All 14 tile in a four-column home grid at phone widths.
+- [x] Use catalogue display names in department breadcrumbs.
+- [x] Verify the interactions and layout at 360, 390, and 430px.
