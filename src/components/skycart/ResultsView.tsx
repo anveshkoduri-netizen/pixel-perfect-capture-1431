@@ -221,7 +221,6 @@ export function ResultsView({
             <div className="flex shrink-0 items-center justify-between gap-2 border-t border-border bg-card px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
               <p className="min-w-0 text-[12px] text-muted-foreground">
                 <strong className="text-foreground">{plural(filtered.length, "product")}</strong>
-                {categorySlug && categoryBySlug(categorySlug) ? ` · of ${categoryBySlug(categorySlug)?.count.toLocaleString("en-IN")} in ${categoryName ?? categoryBySlug(categorySlug)?.name}` : " in the catalogue"}
               </p>
               <PillButton className="shrink-0" onClick={() => setMobileFiltersOpen(false)}>Show {plural(filtered.length, "product")}</PillButton>
             </div>
