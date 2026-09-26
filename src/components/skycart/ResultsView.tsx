@@ -220,7 +220,7 @@ export function ResultsView({
       </div>
 
       {mobileFiltersOpen ? (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 mx-auto max-w-[430px]">
           <div
             className="absolute inset-0 bg-foreground/35"
             onClick={() => setMobileFiltersOpen(false)}

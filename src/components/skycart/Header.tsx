@@ -110,7 +110,7 @@ export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-4 md:hidden">
+    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] pb-4">
       <div className="container-page">
         <div className="pointer-events-auto mx-auto flex max-w-md items-center justify-between gap-1 rounded-full border border-border bg-card/95 p-1.5 shadow-nav backdrop-blur">
           {mobileDestinations.map((destination) => {

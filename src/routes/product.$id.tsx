@@ -264,7 +264,8 @@ function ProductPage() {
               <QuantityStepper qty={qty} onChange={(n) => setQty(Math.max(1, n))} />
             </div>
 
-            <div className="mt-4 space-y-2.5">
+            <PurchaseDock product={product} onAdd={addToCart} disabled={product.stock === "out" || !deliverable} />
+            <div className="mt-4 space-y-2.5" data-purchase-cta>
               <PillButton
                 className="w-full"
                 size="lg"
