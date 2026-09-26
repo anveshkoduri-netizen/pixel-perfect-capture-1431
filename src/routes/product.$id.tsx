@@ -343,6 +343,8 @@ function PurchaseDock({
   disabled: boolean;
 }) {
   const [show, setShow] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   useEffect(() => {
     const onScroll = () => {
       const el = document.querySelector("[data-purchase-cta]");
@@ -352,7 +354,7 @@ function PurchaseDock({
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [product.id]);
-  if (typeof document === "undefined") return null;
+  if (!mounted) return null;
   return createPortal(
     <div
       className={cn(
