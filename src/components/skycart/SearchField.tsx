@@ -10,7 +10,9 @@ export function SearchField({
   showExamples = false,
   autoFocus = false,
   className,
+  placeholder = "What are you looking for?",
 }: {
+  placeholder?: string | undefined;
   size?: "md" | "lg" | undefined;
   initialQuery?: string | undefined;
   showExamples?: boolean | undefined;
@@ -60,7 +62,7 @@ export function SearchField({
             setQuery(e.target.value);
             setOpen(true);
           }}
-          placeholder="What are you looking for?"
+          placeholder={placeholder}
           aria-label="Search SKYCART"
           className={cn(
             "min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground",
@@ -112,14 +114,14 @@ export function SearchField({
       ) : null}
 
       {showExamples ? (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-[13px] text-muted-foreground">Try</span>
+        <div className="no-scrollbar -mx-4 mt-3 flex items-center gap-2 overflow-x-auto px-4">
+          <span className="shrink-0 text-[12px] text-muted-foreground">Try</span>
           {searchExamples.map((example) => (
             <button
               key={example}
               type="button"
               onClick={() => submit(example)}
-              className="rounded-full border border-border bg-card px-3 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
+              className="shrink-0 whitespace-nowrap rounded-full border border-border bg-card px-3 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:border-primary hover:text-primary"
             >
               {example}
             </button>
