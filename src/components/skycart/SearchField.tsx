@@ -50,10 +50,10 @@ export function SearchField({
         className={cn(
           "flex items-center gap-2 rounded-full border bg-card transition-[border-color,box-shadow]",
           open ? "border-primary shadow-[0_0_0_3px_var(--primary-container)]" : "border-border-strong",
-          size === "lg" ? "h-14 pl-5 pr-2" : "h-11 pl-4 pr-1.5",
+          size === "lg" ? "h-[52px] p-[6px] pl-4" : "h-11 pl-4 pr-1.5",
         )}
       >
-        <Search className={cn("shrink-0 text-muted-foreground", size === "lg" ? "h-5 w-5" : "h-4 w-4")} />
+        <Search className={cn("shrink-0 text-muted-foreground", size === "lg" ? "h-[18px] w-[18px]" : "h-4 w-4")} />
         <input
           value={query}
           autoFocus={autoFocus}
@@ -83,7 +83,7 @@ export function SearchField({
           type="submit"
           className={cn(
             "shrink-0 rounded-full bg-primary font-semibold text-primary-foreground transition-colors hover:bg-primary/92",
-            size === "lg" ? "h-11 px-6 text-[15px]" : "h-8 px-4 text-[13px]",
+            size === "lg" ? "h-10 px-5 text-[14px]" : "h-8 px-4 text-[13px]",
           )}
         >
           Search

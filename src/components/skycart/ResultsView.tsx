@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { categoryBySlug, filterProducts, type Product } from "@/lib/skycart-data";
 import { ProductCard } from "./ProductCard";
 import { FilterPanel, type FilterState } from "./FilterPanel";
-import { PillButton } from "./primitives";
+import { PillButton, plural } from "./primitives";
 
 export type SortKey = "relevance" | "price-asc" | "price-desc" | "rating" | "discount";
 
@@ -116,7 +116,7 @@ export function ResultsView({
             onClick={() => setMobileFiltersOpen(true)}
             className="inline-flex h-10 items-center gap-2 rounded-full border border-border-strong bg-card px-4 text-[13px] font-semibold lg:hidden"
           >
-            <SlidersHorizontal className="h-4 w-4" /> Filters
+            <SlidersHorizontal className="h-[18px] w-[18px]" /> Filters
           </button>
           <label className="sr-only" htmlFor="sort">
             Sort results
@@ -159,7 +159,7 @@ export function ResultsView({
        <div className="mt-5">
          <div>
           <p className="mb-3 text-[13px] text-muted-foreground">
-            {loading ? "Searching the catalogue…" : `${filtered.length} products`}
+            {loading ? "Searching the catalogue…" : plural(filtered.length, "product")}
           </p>
           {loading ? (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
@@ -207,7 +207,7 @@ export function ResultsView({
           />
           <div role="dialog" aria-modal="true" aria-label="Filters" className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col overflow-hidden rounded-t-2xl bg-background">
             <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
-              <h2 className="text-lg font-bold">Filters</h2>
+              <h2 className="text-[20px] font-bold">Filters</h2>
               <div className="flex items-center gap-2">
                 {Object.values(filters).some((values) => values.length > 0) && (
                   <PillButton variant="ghost" size="sm" onClick={() => setFilters({})}>Clear all</PillButton>
@@ -220,10 +220,10 @@ export function ResultsView({
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">{panel}</div>
             <div className="flex shrink-0 items-center justify-between gap-2 border-t border-border bg-card px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
               <p className="min-w-0 text-[12px] text-muted-foreground">
-                <strong className="text-foreground">{filtered.length} products</strong>
+                <strong className="text-foreground">{plural(filtered.length, "product")}</strong>
                 {categorySlug && categoryBySlug(categorySlug) ? ` · of ${categoryBySlug(categorySlug)?.count.toLocaleString("en-IN")} in ${categoryName ?? categoryBySlug(categorySlug)?.name}` : " in the catalogue"}
               </p>
-              <PillButton className="shrink-0" onClick={() => setMobileFiltersOpen(false)}>Show {filtered.length}</PillButton>
+              <PillButton className="shrink-0" onClick={() => setMobileFiltersOpen(false)}>Show {plural(filtered.length, "product")}</PillButton>
             </div>
           </div>
         </div>
