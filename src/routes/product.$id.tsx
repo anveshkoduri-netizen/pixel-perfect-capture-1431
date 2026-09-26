@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart";
-import { discount, inr, productById, products } from "@/lib/skycart-data";
+import { categoryBySlug, discount, inr, productById, products } from "@/lib/skycart-data";
 import { productGallery } from "@/lib/product-images";
 import {
   DeliveryLine,
@@ -79,7 +79,7 @@ function ProductPage() {
         </Link>
         <span>/</span>
         <Link to="/category/$slug" params={{ slug: product.category }} className="hover:text-primary">
-          {product.category.replace(/-/g, " ")}
+          {categoryBySlug(product.category)?.name ?? product.category}
         </Link>
         <span>/</span>
         <span className="font-medium text-foreground">{product.name}</span>
@@ -330,8 +330,9 @@ function ProductPage() {
             </div>
 
             <PurchaseDock product={product} qty={qty} setQty={setQty} onAdd={addToCart} disabled={product.stock === "out" || !deliverable} />
-            <div className="mt-4 space-y-2.5" data-purchase-cta>
+            <div className="mt-4 space-y-2.5">
               <PillButton
+                data-purchase-cta
                 className="w-full"
                 size="lg"
                 onClick={addToCart}
@@ -433,19 +434,19 @@ function PurchaseDock({
   if (!mounted) return null;
   return createPortal(
     <div
-      className={cn(
-        "fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] border-t border-border bg-card px-4 pb-5 pt-3 transition-all duration-200",
+       className={cn(
+         "fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] border-t border-border bg-card p-4 transition-transform duration-200 motion-reduce:transition-none",
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0",
       )}
       aria-hidden={!show}
     >
-      <div className="flex items-center gap-2.5">
+       <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2">
         <div className="min-w-0 flex-1">
-          <p className="font-display text-lg font-extrabold leading-tight">{inr(product.price * qty)}</p>
-          <p className="truncate text-[11px] text-muted-foreground">incl. GST</p>
+           <p className="truncate font-display text-base font-extrabold leading-tight">{inr(product.price * qty)}</p>
+           <p className="text-[11px] text-muted-foreground">incl. GST</p>
         </div>
         <QuantityStepper qty={qty} onChange={(n) => setQty(Math.max(1, n))} />
-        <PillButton onClick={onAdd} disabled={disabled}>
+         <PillButton size="sm" className="whitespace-nowrap px-3" onClick={onAdd} disabled={disabled}>
           Add to cart
         </PillButton>
       </div>
