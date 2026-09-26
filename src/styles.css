@@ -186,3 +186,10 @@ body[data-dock="on"] [data-bottom-nav] {
 [data-bottom-nav] {
   transition: transform 200ms ease, opacity 200ms ease;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-bottom-nav],
+  [data-purchase-dock] {
+    transition: none;
+  }
+}

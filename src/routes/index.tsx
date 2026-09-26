@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileText, ListChecks, Truck } from "lucide-react";
+import { ArrowRight, FileText, ListChecks, Truck } from "lucide-react";
 import { SearchField } from "@/components/skycart/SearchField";
 import { ProductCard } from "@/components/skycart/ProductCard";
 import { SectionHeader, categoryIcons } from "@/components/skycart/primitives";
@@ -35,10 +35,6 @@ const homeCategories: CategorySlug[] = [
   "plumbing",
   "hardware",
   "safety",
-  "construction-supplies",
-  "industrial-supplies",
-  "fasteners",
-  "paint-adhesives",
 ];
 
 const pick = (ids: string[]) =>
@@ -68,7 +64,7 @@ const frequent = pick([
 
 function CategoryStrip() {
   return (
-    <div className="no-scrollbar -mx-4 grid auto-cols-[76px] grid-flow-col grid-rows-2 gap-x-2 gap-y-3 overflow-x-auto px-4">
+    <div className="grid grid-cols-4 gap-x-2 gap-y-3">
       {homeCategories.map((slug) => {
         const category = categories.find((c) => c.slug === slug);
         if (!category) return null;
@@ -78,15 +74,21 @@ function CategoryStrip() {
             key={slug}
             to="/category/$slug"
             params={{ slug }}
-            className="flex flex-col items-center gap-1.5 rounded-xl p-1 text-center"
+            className="flex min-w-0 flex-col items-center gap-1.5 rounded-lg p-1 text-center"
           >
-            <span className="grid h-14 w-14 place-items-center rounded-2xl border border-border bg-card text-primary">
+            <span className="grid h-12 w-12 place-items-center rounded-lg border border-border bg-card text-primary">
               <Icon className="h-6 w-6" />
             </span>
-            <span className="line-clamp-2 text-[11px] font-semibold leading-tight">{category.name}</span>
+            <span className="line-clamp-2 w-full text-[11px] font-semibold leading-tight">{category.name}</span>
           </Link>
         );
       })}
+      <Link to="/categories" className="flex min-w-0 flex-col items-center gap-1.5 rounded-lg p-1 text-center">
+        <span className="grid h-12 w-12 place-items-center rounded-lg border border-border bg-primary-container text-primary">
+          <ArrowRight className="h-5 w-5" />
+        </span>
+        <span className="w-full text-[11px] font-semibold leading-tight">All {categories.length}</span>
+      </Link>
     </div>
   );
 }
