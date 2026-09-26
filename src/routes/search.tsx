@@ -7,7 +7,8 @@ import { ProductCard } from "@/components/skycart/ProductCard";
 import { ResultsView } from "@/components/skycart/ResultsView";
 import { EmptyState, PillButton, SectionHeader, categoryIcons } from "@/components/skycart/primitives";
 import { interpret, relaxedResults, searchProducts } from "@/lib/search";
-import { categories, categoryBySlug } from "@/lib/skycart-data";
+import { categories, categoryBySlug, products } from "@/lib/skycart-data";
+import type { FilterState } from "@/components/skycart/FilterPanel";
 
 export const Route = createFileRoute("/search")({
   validateSearch: z.object({ q: z.string().optional().default("") }),
@@ -144,6 +145,15 @@ function SearchPage() {
   const relaxed = relaxedResults(interpretation);
   const relaxedQuery = interpretation.tokens.find((t) => t.kind !== "Product type")?.value;
   const category = interpretation.category ? categoryBySlug(interpretation.category) : undefined;
+  const initialFilters: FilterState = {};
+  for (const token of interpretation.tokens) {
+    const group = token.kind === "Current rating" ? "Current"
+      : token.kind === "Cable size" ? "Size" : token.kind;
+    initialFilters[group] = [...(initialFilters[group] ?? []), token.value];
+  }
+  const facetCatalogue = category && interpretation.tokens.length > 0
+    ? products.filter((product) => product.category === category.slug)
+    : results;
 
   return (
     <>
@@ -153,7 +163,10 @@ function SearchPage() {
         </div>
       </div>
       <ResultsView
+        key={q}
         results={results}
+        facetCatalogue={facetCatalogue}
+        initialFilters={initialFilters}
         loading={loading}
         categoryName={category?.name}
         categorySlug={category?.slug}

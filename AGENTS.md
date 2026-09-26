@@ -15,3 +15,4 @@
 - Cart, wishlist, saved and recently-viewed state lives in `src/lib/cart.tsx` (React context + localStorage) — no backend yet, so all commerce state flows through that provider.
 - Shared SKYCART UI (header, bottom nav, product card, filters, results view, primitives) lives in `src/components/skycart/`; pages compose these instead of defining one-off styles.
 - The app is a mobile-only prototype: Tailwind breakpoints are disabled in `src/styles.css` and the root renders a 430px phone frame, so never add desktop layouts (sidebars, wide headers); fixed bars use `inset-x-0 mx-auto max-w-[430px]`.
+- Facet definitions and matching live in `src/lib/skycart-data.ts`, shared by search and category result views, so chip counts and visible results cannot diverge.
