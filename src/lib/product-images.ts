@@ -21,6 +21,9 @@ import tapariaSpannerSet from "@/assets/products/taparia-spanner-set.jpg";
 import astralPvcFittingSet from "@/assets/products/astral-pvc-fitting-set.jpg";
 import jkLakshmiWireMesh from "@/assets/products/jk-lakshmi-wire-mesh.jpg";
 import boschGbh226 from "@/assets/products/bosch-gbh-2-26.jpg";
+import mcbSide from "@/assets/products/havells-32a-mcb-side.jpg";
+import mcbTerminals from "@/assets/products/havells-32a-mcb-terminals.jpg";
+import mcbBoard from "@/assets/products/havells-32a-mcb-board.jpg";
 import genericSsBoltSet from "@/assets/products/generic-ss-bolt-set.jpg";
 
 export const productImages: Record<string, string> = {
@@ -48,7 +51,27 @@ export const productImages: Record<string, string> = {
   "jk-lakshmi-wire-mesh": jkLakshmiWireMesh,
   "bosch-gbh-2-26": boschGbh226,
   "generic-ss-bolt-set": genericSsBoltSet,
+  "havells-32a-dp-mcb": havells32aMcb,
+  "havells-32a-tp-mcb": havells32aMcb,
+  "havells-32a-tpn-mcb": havells32aMcb,
+  "schneider-32a-sp-mcb": havells32aMcb,
+  "legrand-32a-sp-b-mcb": havells32aMcb,
+  "lt-32a-dp-mcb": havells32aMcb,
 };
+
+const mcbGallery = [
+  { src: havells32aMcb, label: "Front" },
+  { src: mcbSide, label: "Side" },
+  { src: mcbTerminals, label: "Terminals" },
+  { src: mcbBoard, label: "In a distribution board" },
+];
+
+/** Distinct gallery views per product. Products with one photo return a single view. */
+export function productGallery(id: string): Array<{ src: string; label: string }> {
+  if (id.includes("32a") && id.includes("mcb")) return mcbGallery;
+  const main = productImages[id];
+  return main ? [{ src: main, label: "Front" }] : [];
+}
 
 export function productImage(id: string): string | undefined {
   return productImages[id];
