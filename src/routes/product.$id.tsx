@@ -331,3 +331,43 @@ function ProductPage() {
     </div>
   );
 }
+
+function PurchaseDock({
+  product,
+  onAdd,
+  disabled,
+}: {
+  product: { id: string; name: string; price: number };
+  onAdd: () => void;
+  disabled: boolean;
+}) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const el = document.querySelector("[data-purchase-cta]");
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry) setShow(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [product.id]);
+  return (
+    <div
+      className={cn(
+        "fixed inset-x-0 bottom-[92px] z-40 mx-auto max-w-[430px] px-4 transition-all duration-200",
+        show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
+      )}
+      aria-hidden={!show}
+    >
+      <div className="flex items-center gap-3 rounded-full border border-border bg-card p-1.5 pl-5 shadow-nav">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] text-muted-foreground">{product.name}</p>
+          <p className="font-display text-base font-extrabold">{inr(product.price)}</p>
+        </div>
+        <PillButton onClick={onAdd} disabled={disabled}>
+          Add to cart
+        </PillButton>
+      </div>
+    </div>
+  );
+}
