@@ -1,3 +1,4 @@
+import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { productById, products, type Product } from "./skycart-data";
 
@@ -21,7 +22,9 @@ type CartState = {
   totals: { subtotal: number; mrpTotal: number; savings: number; delivery: number; allFree: boolean; gstIncluded: number; total: number };
 };
 
-const CartContext = createContext<CartState | null>(null);
+// Keep one context instance across hot reloads so the provider and hooks always match.
+const globalForCart = globalThis as unknown as { __skycartCartContext?: React.Context<CartState | null> };
+const CartContext = (globalForCart.__skycartCartContext ??= createContext<CartState | null>(null));
 
 const STORAGE_KEY = "skycart.cart.v1";
 /** Per-line delivery charge for products without free delivery; shown on cards, PDP and cart lines. */
