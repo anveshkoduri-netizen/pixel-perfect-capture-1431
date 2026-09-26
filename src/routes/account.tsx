@@ -141,9 +141,12 @@ function AccountPage() {
               <p className="text-sm text-muted-foreground">
                 Your three most recent orders are on the orders page, with delivery status and invoices.
               </p>
-              <PillButton className="mt-4" onClick={() => undefined}>
-                <Link to="/orders">Go to orders</Link>
-              </PillButton>
+              <Link
+                to="/orders"
+                className="mt-4 inline-flex h-11 items-center rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground hover:bg-primary/92"
+              >
+                Go to orders
+              </Link>
             </Panel>
           ) : null}
 
