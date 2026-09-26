@@ -897,7 +897,7 @@ export function filterGroupsFor(categorySlug: string | undefined, catalogue: Pro
         : group.label === "Product type" && categorySlug === "electrical"
           ? [...new Set(catalogue.map((p) => /\bMCB\b/i.test(p.name) ? "MCB" : /\bswitch\b/i.test(p.name) ? "Switch" : "").filter(Boolean))]
           : [];
-    return { label: group.label, options: [...new Set([...actual, ...group.options])] };
+    return { label: group.label, options: group.label === "Brand" ? actual : [...new Set([...actual, ...group.options])] };
   });
 }
 
@@ -914,7 +914,7 @@ export function productMatchesFacet(product: Product, group: string, option: str
     if (option === priceBands[2]) return product.price > 2000 && product.price <= 10000;
     return product.price > 10000;
   }
-  if (group === "Rating") return product.rating >= Number.parseFloat(option);
+  if (group === "Rating" && option.includes("above")) return product.rating >= Number.parseFloat(option);
   if (group === "Availability") {
     if (option === "In stock") return product.stock !== "out";
     if (option === "Delivery tomorrow") return product.delivery === "Tomorrow";
@@ -929,7 +929,10 @@ export function productMatchesFacet(product: Product, group: string, option: str
   }
   if (group === "Current") return specMatches(["Current rating"]);
   if (group === "Size") return specMatches(["Cable size", "Size"]);
-  if (group === "Rating" || group === "Curve") return specMatches([group, "Breaking capacity"]);
+  if (group === "Rating") return specMatches(["Breaking capacity"]);
+  if (group === "Curve") return specMatches(["Curve"]);
+  if (group === "Voltage") return specMatches(["Voltage", "Rated voltage"]) ||
+    product.glanceStats?.some((s) => s.label === "Rated voltage" && normalized(s.value) === normalized(option)) === true;
   if (specMatches([group, group === "Core" ? "Cores" : group])) return true;
   return text.includes(option.toLowerCase());
 }
