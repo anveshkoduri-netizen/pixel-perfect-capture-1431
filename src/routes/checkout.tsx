@@ -321,9 +321,17 @@ function CheckoutPage() {
                   </div>
                 </dl>
                 {step === 1 ? (
-                  <PillButton className="mt-5 w-full" size="lg" onClick={pay}>
-                    Pay {inr(total)}
-                  </PillButton>
+                  <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] border-t border-border bg-card px-4 pb-5 pt-3">
+                    <div className="flex items-center gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[11px] text-muted-foreground">Total incl. GST</p>
+                        <p className="font-display text-lg font-extrabold">{inr(total)}</p>
+                      </div>
+                      <PillButton className="flex-1" size="lg" onClick={pay}>
+                        Pay {inr(total)}
+                      </PillButton>
+                    </div>
+                  </div>
                 ) : null}
               </div>
             </aside>

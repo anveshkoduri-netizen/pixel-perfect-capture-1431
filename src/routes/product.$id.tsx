@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { AlertTriangle, Check, Heart, MapPin, PackageX, ShieldCheck, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart";
@@ -99,9 +100,9 @@ function ProductPage() {
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
-        <div>
-          <div className="surface-card p-4">
+      <div className="mt-5 flex flex-col gap-5 [&_section.mt-5]:mt-0 [&>div>.mt-5]:mt-0">
+        <div className="contents">
+          <div className="surface-card order-[-2] p-4">
             <ProductTile product={product} className="aspect-[4/3] w-full" />
             <div className="mt-3 flex gap-2">
               {[0, 1, 2, 3].map((index) => (
@@ -213,7 +214,7 @@ function ProductPage() {
           </section>
         </div>
 
-        <div className="lg:sticky lg:top-32 lg:self-start">
+        <div className="order-[-1]">
           <div className="surface-card p-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{product.brand}</p>
             <h1 className="mt-1.5 text-[22px] font-extrabold leading-tight">{product.name}</h1>
@@ -264,7 +265,8 @@ function ProductPage() {
               <QuantityStepper qty={qty} onChange={(n) => setQty(Math.max(1, n))} />
             </div>
 
-            <div className="mt-4 space-y-2.5">
+            <PurchaseDock product={product} onAdd={addToCart} disabled={product.stock === "out" || !deliverable} />
+            <div className="mt-4 space-y-2.5" data-purchase-cta>
               <PillButton
                 className="w-full"
                 size="lg"
@@ -328,5 +330,49 @@ function ProductPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function PurchaseDock({
+  product,
+  onAdd,
+  disabled,
+}: {
+  product: { id: string; name: string; price: number };
+  onAdd: () => void;
+  disabled: boolean;
+}) {
+  const [show, setShow] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.querySelector("[data-purchase-cta]");
+      setShow(!!el && el.getBoundingClientRect().bottom < 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [product.id]);
+  if (!mounted) return null;
+  return createPortal(
+    <div
+      className={cn(
+        "fixed inset-x-0 bottom-[92px] z-40 mx-auto max-w-[430px] px-4 transition-all duration-200",
+        show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
+      )}
+      aria-hidden={!show}
+    >
+      <div className="flex items-center gap-3 rounded-full border border-border bg-card p-1.5 pl-5 shadow-nav">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] text-muted-foreground">{product.name}</p>
+          <p className="font-display text-base font-extrabold">{inr(product.price)}</p>
+        </div>
+        <PillButton onClick={onAdd} disabled={disabled}>
+          Add to cart
+        </PillButton>
+      </div>
+    </div>,
+    document.body,
   );
 }

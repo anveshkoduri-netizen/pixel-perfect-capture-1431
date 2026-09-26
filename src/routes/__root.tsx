@@ -13,7 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "../lib/cart";
-import { BottomNav, SiteFooter, SiteHeader } from "../components/skycart/Header";
+import { BottomNav, SiteHeader } from "../components/skycart/Header";
 import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
@@ -112,7 +112,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="bg-surface-soft">
         {children}
         <Scripts />
       </body>
@@ -128,13 +128,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        <div className="flex min-h-screen flex-col">
+        <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-x-clip bg-background shadow-raised">
           {focusedFlow ? null : <SiteHeader />}
-          <main className={focusedFlow ? "flex-1" : "flex-1 pb-28 md:pb-0"}>
+          <main className="flex-1 pb-28">
             {/* Required: nested routes render here. */}
             <Outlet />
           </main>
-          {focusedFlow ? null : <SiteFooter />}
           {focusedFlow ? null : <BottomNav />}
         </div>
         <Toaster />
