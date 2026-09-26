@@ -26,12 +26,14 @@ export type Interpretation = {
   tokens: Token[];
   category?: CategorySlug | undefined;
   brand?: string | undefined;
+  typeWords?: string[] | undefined;
 };
 
 export function interpret(query: string): Interpretation {
   const q = query.toLowerCase();
   const tokens: Token[] = [];
   let category: CategorySlug | undefined;
+  let typeWords: string[] | undefined;
 
   const sqmm = q.match(/(\d+(?:\.\d+)?)\s*(?:sq\s*mm|sqmm|mm2)/);
   if (sqmm) tokens.push({ value: `${sqmm[1]} sq mm`, kind: "Cable size" });
@@ -58,6 +60,7 @@ export function interpret(query: string): Interpretation {
     if (entry.words.some((w) => q.includes(w))) {
       tokens.push({ value: entry.type, kind: "Product type" });
       category = entry.category;
+      typeWords = entry.words;
       break;
     }
   }
@@ -72,7 +75,7 @@ export function interpret(query: string): Interpretation {
     if (cat) category = cat.slug;
   }
 
-  return { tokens, category, brand };
+  return { tokens, category, brand, typeWords };
 }
 
 function score(product: Product, query: string, interpretation: Interpretation) {
@@ -92,15 +95,37 @@ function score(product: Product, query: string, interpretation: Interpretation) 
   return s;
 }
 
+const squash = (x: string) => x.toLowerCase().replace(/\s+/g, "");
+
+/** A product matches only when it satisfies every understood spec, type and brand. */
+function matchesAll(product: Product, interpretation: Interpretation) {
+  const haystack = `${product.brand} ${product.name} ${product.specLine} ${product.specs.map((x) => x.value).join(" ")}`;
+  const flat = squash(haystack);
+  const lower = haystack.toLowerCase();
+  return interpretation.tokens.every((token) => {
+    if (token.kind === "Brand") return product.brand === token.value;
+    if (token.kind === "Product type") {
+      return (
+        product.category === interpretation.category &&
+        (interpretation.typeWords ?? []).some((w) => new RegExp(`\\b${w}\\b`).test(lower))
+      );
+    }
+    return flat.includes(squash(token.value));
+  });
+}
+
 export function searchProducts(query: string) {
   const interpretation = interpret(query);
-  if (!query.trim()) return { interpretation, results: products, exact: true };
-  const scored = products
+  if (!query.trim()) return { interpretation, results: products, related: [] as Product[], exact: true };
+  const ranked = products
     .map((product) => ({ product, s: score(product, query, interpretation) }))
     .filter((x) => x.s > 0)
-    .sort((a, b) => b.s - a.s);
-  const results = scored.map((x) => x.product);
-  return { interpretation, results, exact: results.length > 0 };
+    .sort((a, b) => b.s - a.s)
+    .map((x) => x.product);
+  const strict = interpretation.tokens.length > 0;
+  const results = strict ? ranked.filter((p) => matchesAll(p, interpretation)) : ranked;
+  const related = strict ? ranked.filter((p) => !results.includes(p)).slice(0, 6) : [];
+  return { interpretation, results, related, exact: results.length > 0 };
 }
 
 export function relaxedResults(interpretation: Interpretation) {
