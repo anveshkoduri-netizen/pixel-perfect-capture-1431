@@ -24,7 +24,8 @@ export function FilterPanel({
 
   function countFor(group: string, option: string) {
     const selected = state[group] ?? [];
-    const next = selected.includes(option) ? state : { ...state, [group]: [...selected, option] };
+    // Compare alternatives against other groups, not against the existing value of this group.
+    const next = { ...state, [group]: [option] };
     return filterProducts(catalogue, next).length;
   }
 
