@@ -1,4 +1,4 @@
-- [ ] Preselect interpreted search specifications and let filter chips change search results.
-- [ ] Show catalogue-derived filter values, live per-value counts, and zero-result feedback.
-- [ ] Simplify the filter sheet and add a sticky live-result footer.
-- [ ] Verify search and category filter interactions on phone widths.
+- [x] Preselect interpreted search specifications and let filter chips change search results.
+- [x] Show catalogue-derived filter values, live per-value counts, and zero-result feedback.
+- [x] Simplify the filter sheet and add a sticky live-result footer.
+- [x] Verify search and category filter interactions on phone widths.

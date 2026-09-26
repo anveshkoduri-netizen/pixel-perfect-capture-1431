@@ -23,7 +23,6 @@ export function FilterPanel({
   const [notice, setNotice] = useState("");
 
   function countFor(group: string, option: string) {
-    const selected = state[group] ?? [];
     // Compare alternatives against other groups, not against the existing value of this group.
     const next = { ...state, [group]: [option] };
     return filterProducts(catalogue, next).length;
