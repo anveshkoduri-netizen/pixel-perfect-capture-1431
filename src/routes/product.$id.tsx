@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { AlertTriangle, Check, Heart, MapPin, PackageX, ShieldCheck, Truck } from "lucide-react";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart";
@@ -351,7 +352,8 @@ function PurchaseDock({
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [product.id]);
-  return (
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <div
       className={cn(
         "fixed inset-x-0 bottom-[92px] z-40 mx-auto max-w-[430px] px-4 transition-all duration-200",
@@ -368,6 +370,7 @@ function PurchaseDock({
           Add to cart
         </PillButton>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
