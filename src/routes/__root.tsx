@@ -128,7 +128,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <CartProvider>
-        <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col bg-background shadow-raised">
+        <div className="relative mx-auto flex min-h-screen w-full max-w-[430px] flex-col overflow-x-clip bg-background shadow-raised">
           {focusedFlow ? null : <SiteHeader />}
           <main className="flex-1 pb-28">
             {/* Required: nested routes render here. */}

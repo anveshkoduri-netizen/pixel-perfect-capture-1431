@@ -99,9 +99,9 @@ function ProductPage() {
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
-        <div>
-          <div className="surface-card p-4">
+      <div className="mt-5 flex flex-col gap-5 [&_section.mt-5]:mt-0 [&>div>.mt-5]:mt-0">
+        <div className="contents">
+          <div className="surface-card order-[-2] p-4">
             <ProductTile product={product} className="aspect-[4/3] w-full" />
             <div className="mt-3 flex gap-2">
               {[0, 1, 2, 3].map((index) => (
@@ -213,7 +213,7 @@ function ProductPage() {
           </section>
         </div>
 
-        <div className="lg:sticky lg:top-32 lg:self-start">
+        <div className="order-[-1]">
           <div className="surface-card p-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{product.brand}</p>
             <h1 className="mt-1.5 text-[22px] font-extrabold leading-tight">{product.name}</h1>
