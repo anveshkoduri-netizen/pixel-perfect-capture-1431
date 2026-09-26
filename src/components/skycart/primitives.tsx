@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import {
   Bolt,
+  Check,
+  X,
   BrickWall,
   Cable,
   Droplets,
@@ -18,6 +20,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import type { CategorySlug } from "@/lib/skycart-data";
 
@@ -58,22 +61,46 @@ export function PillButton({ className, variant = "primary", size = "md", ...pro
   );
 }
 
+/** The single chip used for filters, applied filters, search understanding and sort. */
 export function Chip({
   children,
   selected,
+  unavailable,
+  count,
+  removable,
   className,
+  onClick,
   ...props
-}: ComponentProps<"button"> & { selected?: boolean | undefined }) {
+}: ComponentProps<"button"> & {
+  selected?: boolean | undefined;
+  unavailable?: boolean | undefined;
+  count?: number | undefined;
+  removable?: boolean | undefined;
+}) {
+  const state = unavailable && !selected ? "chip-disabled" : selected ? "chip-selected" : "chip-default";
   return (
     <button
+      type="button"
+      aria-pressed={removable ? undefined : Boolean(selected)}
+      aria-disabled={state === "chip-disabled" || undefined}
+      onClick={(e) => {
+        if (state === "chip-disabled") {
+          toast("No products with this in your current selection");
+          return;
+        }
+        onClick?.(e);
+      }}
       className={cn(
         "chip inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-[14px] text-[13px] font-semibold transition-colors [&_svg]:h-3.5 [&_svg]:w-3.5",
-        selected ? "chip-selected" : "chip-default",
+        state,
         className,
       )}
       {...props}
     >
-      {children}
+      {selected && !removable ? <Check aria-hidden /> : null}
+      <span>{children}</span>
+      {count !== undefined ? <span className="chip-count tabular-nums">{count}</span> : null}
+      {removable ? <X aria-hidden /> : null}
     </button>
   );
 }

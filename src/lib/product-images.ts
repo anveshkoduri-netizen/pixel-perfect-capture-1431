@@ -1,3 +1,4 @@
+import { productById } from "./skycart-data";
 import boschGsb18v50 from "@/assets/products/bosch-gsb-18v-50.jpg";
 import polycab25FrWire from "@/assets/products/polycab-2-5-fr-wire.jpg";
 import havells32aMcb from "@/assets/products/havells-32a-mcb.jpg";
@@ -69,10 +70,10 @@ const mcbGallery = [
 /** Distinct gallery views per product. Products with one photo return a single view. */
 export function productGallery(id: string): Array<{ src: string; label: string }> {
   if (id.includes("32a") && id.includes("mcb")) return mcbGallery;
-  const main = productImages[id];
+  const main = productImage(id);
   return main ? [{ src: main, label: "Front" }] : [];
 }
 
 export function productImage(id: string): string | undefined {
-  return productImages[id];
+  return productImages[id] ?? productImages[productById(id)?.imageOf ?? ""];
 }

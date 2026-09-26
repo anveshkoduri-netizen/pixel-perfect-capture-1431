@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { SearchX, Sparkles, WifiOff } from "lucide-react";
+import { SearchX, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { SearchField } from "@/components/skycart/SearchField";
 import { ProductCard } from "@/components/skycart/ProductCard";
 import { ResultsView } from "@/components/skycart/ResultsView";
 import { EmptyState, PillButton, SectionHeader, categoryIcons } from "@/components/skycart/primitives";
-import { interpret, relaxedResults, searchProducts } from "@/lib/search";
+import { relaxedResults, searchProducts } from "@/lib/search";
 import { categories, categoryBySlug, products } from "@/lib/skycart-data";
 import type { FilterState } from "@/components/skycart/FilterPanel";
 
@@ -28,41 +28,6 @@ export const Route = createFileRoute("/search")({
   }),
   component: SearchPage,
 });
-
-function Interpretation({ query }: { query: string }) {
-  const { tokens, category } = interpret(query);
-  if (tokens.length === 0) return null;
-  const cat = category ? categoryBySlug(category) : undefined;
-  return (
-    <div className="surface-card mt-4 flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
-      <div className="min-w-0">
-        <p className="eyebrow flex items-center gap-1.5">
-          <Sparkles className="h-3.5 w-3.5 text-primary" /> We understood
-        </p>
-        <div className="mt-2.5 flex flex-wrap gap-2">
-          {tokens.map((token) => (
-            <span
-              key={`${token.kind}-${token.value}`}
-              className="rounded-lg bg-primary-container px-3 py-1.5 leading-tight"
-            >
-              <span className="block text-[13px] font-bold text-primary-container-foreground">{token.value}</span>
-              <span className="block text-[11px] text-muted-foreground">{token.kind}</span>
-            </span>
-          ))}
-        </div>
-      </div>
-      {cat ? (
-        <Link
-          to="/category/$slug"
-          params={{ slug: cat.slug }}
-          className="shrink-0 rounded-full border border-border-strong bg-card px-4 py-2 text-[13px] font-semibold hover:bg-surface-soft"
-        >
-          Browse all {cat.name}
-        </Link>
-      ) : null}
-    </div>
-  );
-}
 
 function SearchPage() {
   const { q } = Route.useSearch();
@@ -149,8 +114,7 @@ function SearchPage() {
   const category = interpretation.category ? categoryBySlug(interpretation.category) : undefined;
   const initialFilters: FilterState = {};
   for (const token of interpretation.tokens) {
-    const group = token.kind === "Current rating" ? "Current"
-      : token.kind === "Cable size" ? "Size" : token.kind;
+    const group = token.kind;
     initialFilters[group] = [...(initialFilters[group] ?? []), token.value];
   }
   const facetCatalogue = category && interpretation.tokens.length > 0
@@ -173,15 +137,13 @@ function SearchPage() {
         categoryName={category?.name}
         categorySlug={category?.slug}
         breadcrumb={[{ label: "Home", to: "/" }, { label: "Search" }, { label: q }]}
-        heading={`"${q}"`}
-        subheading={
-          category ? `Matching products in ${category.name} and related categories` : "Matching products"
-        }
-        interpretation={<Interpretation query={q} />}
+        heading={`Results for ${q}`}
+        understood
+        headerLink={category ? { label: `Browse all ${category.name}`, slug: category.slug } : undefined}
         emptyState={
           <EmptyState
             icon={SearchX}
-            title={`No products match "${q}"`}
+            title={`No products match ${q}`}
             description="Here's what's closest. Widening the query usually finds an equivalent product."
           >
             {relaxedQuery ? (

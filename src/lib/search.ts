@@ -9,7 +9,9 @@ const typeMap: Array<{ words: string[]; type: string; category: CategorySlug }> 
   { words: ["wire", "wires", "cable", "cables"], type: "Wire", category: "wires-cables" },
   { words: ["mcb", "rccb", "breaker"], type: "MCB", category: "electrical" },
   { words: ["switch", "socket"], type: "Switch", category: "electrical" },
-  { words: ["led", "batten", "light", "lighting", "floodlight", "bulb"], type: "LED luminaire", category: "lighting" },
+  { words: ["floodlight"], type: "Floodlight", category: "lighting" },
+  { words: ["led", "batten", "light", "lighting"], type: "Batten", category: "lighting" },
+  { words: ["bulb"], type: "Bulb", category: "lighting" },
   { words: ["pipe", "pipes", "fitting", "fittings", "pvc", "upvc"], type: "Pipe", category: "plumbing" },
   { words: ["helmet", "gloves", "harness"], type: "Safety product", category: "safety" },
   { words: ["cement"], type: "Cement", category: "construction-supplies" },
@@ -36,13 +38,13 @@ export function interpret(query: string): Interpretation {
   let typeWords: string[] | undefined;
 
   const sqmm = q.match(/(\d+(?:\.\d+)?)\s*(?:sq\s*mm|sqmm|mm2)/);
-  if (sqmm) tokens.push({ value: `${sqmm[1]} sq mm`, kind: "Cable size" });
+  if (sqmm) tokens.push({ value: `${sqmm[1]} sq mm`, kind: "Size" });
 
   const volts = q.match(/(\d+(?:\.\d+)?)\s*v\b/);
   if (volts) tokens.push({ value: `${volts[1]} V`, kind: "Voltage" });
 
   const amps = q.match(/(\d+(?:\.\d+)?)\s*a\b/);
-  if (amps) tokens.push({ value: `${amps[1]} A`, kind: "Current rating" });
+  if (amps) tokens.push({ value: `${amps[1]} A`, kind: "Current" });
 
   const watts = q.match(/(\d+(?:\.\d+)?)\s*w\b/);
   if (watts) tokens.push({ value: `${watts[1]} W`, kind: "Wattage" });
