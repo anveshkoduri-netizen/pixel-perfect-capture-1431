@@ -4,10 +4,12 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart";
 import { discount, inr, type Product } from "@/lib/skycart-data";
+import { productImage } from "@/lib/product-images";
 import { Badge, PillButton, categoryIcons } from "./primitives";
 
 export function ProductTile({ product, className }: { product: Product; className?: string | undefined }) {
   const Icon = categoryIcons[product.category];
+  const image = productImage(product.id);
   return (
     <div
       className={cn(
@@ -15,7 +17,16 @@ export function ProductTile({ product, className }: { product: Product; classNam
         className,
       )}
     >
-      <Icon className="h-1/3 w-1/3 text-primary/35" strokeWidth={1.2} />
+      {image ? (
+        <img
+          src={image}
+          alt={`${product.brand} ${product.name}`}
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <Icon className="h-1/3 w-1/3 text-primary/35" strokeWidth={1.2} />
+      )}
       <span className="absolute bottom-2 left-2.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/70">
         {product.brand.split(" ")[0]}
       </span>
