@@ -22,6 +22,8 @@ export const Route = createFileRoute("/category/$slug")({
         { name: "description", content: description },
         { property: "og:title", content: `${category.name} — SKYCART` },
         { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
       ],
     };
   },

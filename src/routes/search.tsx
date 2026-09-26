@@ -22,6 +22,8 @@ export const Route = createFileRoute("/search")({
       },
       { property: "og:title", content: "Search industrial supplies — SKYCART" },
       { property: "og:description", content: "Specification-aware search across every SKYCART category." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SearchPage,
