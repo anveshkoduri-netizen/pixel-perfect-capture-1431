@@ -52,7 +52,7 @@ export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   return (
-    <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] pb-4">
+    <nav data-bottom-nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] pb-4">
       <div className="container-page">
         <div className="pointer-events-auto mx-auto flex max-w-md items-center justify-between gap-1 rounded-full border border-border bg-card/95 p-1.5 shadow-nav backdrop-blur">
           {mobileDestinations.map((destination) => {
@@ -64,9 +64,10 @@ export function BottomNav() {
                 key={destination.to}
                 to={destination.to}
                 search={destination.to === "/search" ? { q: "" } : {}}
+                style={{ flexGrow: active ? 1.45 : 1, flexBasis: 0, WebkitTapHighlightColor: "transparent" }}
                 className={cn(
-                  "flex flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-2 text-[11px] font-semibold transition-colors",
-                  active ? "bg-primary-container text-primary" : "text-muted-foreground",
+                  "flex min-w-0 flex-col items-center gap-0.5 rounded-full px-1 py-2 text-[11px] font-semibold transition-[flex-grow,background-color,color] duration-200",
+                  active ? "bg-primary text-primary-foreground" : "text-muted-foreground",
                 )}
               >
                 <Icon className="h-[18px] w-[18px]" />

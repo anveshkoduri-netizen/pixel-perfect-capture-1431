@@ -79,9 +79,78 @@ export type Product = {
   included: string[];
   warranty: string;
   glance: string[];
+  /** Up to three short spec tags pinned on the product photo. */
+  callouts?: string[] | undefined;
+  /** Large "At a glance" values; falls back to the first four specs. */
+  glanceStats?: Array<{ value: string; label: string }> | undefined;
+  /** Products sharing a variant group appear in one selector row on the PDP. */
+  variant?: { group: string; axis: string; label: string } | undefined;
 };
 
 const p = (x: Product) => x;
+
+const poleInfo = {
+  SP: { name: "Single Pole", modules: "1", phase: "Single phase", voltage: "240 V" },
+  DP: { name: "Double Pole", modules: "2", phase: "Single phase", voltage: "240 V" },
+  TP: { name: "Triple Pole", modules: "3", phase: "Three phase", voltage: "415 V" },
+  TPN: { name: "Triple Pole + Neutral", modules: "4", phase: "Three phase", voltage: "415 V" },
+} as const;
+
+function mcb(o: {
+  id: string;
+  brand: string;
+  poles: keyof typeof poleInfo;
+  curve: "B" | "C";
+  price: number;
+  mrp: number;
+  rating: number;
+  reviews: number;
+  delivery: string;
+  freeDelivery: boolean;
+  group?: string;
+  stock?: Product["stock"];
+}): Product {
+  const info = poleInfo[o.poles];
+  return {
+    id: o.id,
+    brand: o.brand,
+    name: `32 A ${info.name} MCB, ${o.curve} Curve`,
+    category: "electrical",
+    specLine: `32 A · ${o.poles} · ${o.curve} curve · 10 kA`,
+    price: o.price,
+    mrp: o.mrp,
+    rating: o.rating,
+    reviews: o.reviews,
+    delivery: o.delivery,
+    freeDelivery: o.freeDelivery,
+    stock: o.stock ?? "in",
+    tags: [],
+    specs: [
+      { label: "Current rating", value: "32 A" },
+      { label: "Poles", value: info.name },
+      { label: "Curve", value: o.curve },
+      { label: "Breaking capacity", value: "10 kA" },
+      { label: "Phase", value: info.phase },
+      { label: "Mounting", value: "35 mm DIN rail" },
+    ],
+    compatibility: [`${o.brand} distribution boards`, "35 mm DIN rail", "Up to 10 sq mm conductors"],
+    included: ["1 × MCB"],
+    warranty: "2 year replacement warranty",
+    glance: [
+      o.curve === "C" ? "C curve for mixed lighting and power loads" : "B curve for resistive and lighting loads",
+      "10 kA short-circuit capacity",
+      "DIN rail mount",
+    ],
+    callouts: ["32 A", `${o.curve}-curve`, "10 kA"],
+    glanceStats: [
+      { value: "32 A", label: "Rated current" },
+      { value: "10 kA", label: "Breaking capacity" },
+      { value: info.voltage, label: "Rated voltage" },
+      { value: info.modules, label: "Module width" },
+    ],
+    variant: o.group ? { group: o.group, axis: "Poles", label: o.poles } : undefined,
+  };
+}
 
 export const products: Product[] = [
   p({
@@ -165,7 +234,21 @@ export const products: Product[] = [
     included: ["1 × MCB"],
     warranty: "2 year replacement warranty",
     glance: ["C curve for mixed lighting and power loads", "10 kA short-circuit capacity", "DIN rail mount"],
+    callouts: ["32 A", "C-curve", "10 kA"],
+    glanceStats: [
+      { value: "32 A", label: "Rated current" },
+      { value: "10 kA", label: "Breaking capacity" },
+      { value: "240 V", label: "Rated voltage" },
+      { value: "1", label: "Module width" },
+    ],
+    variant: { group: "havells-32a-c", axis: "Poles", label: "SP" },
   }),
+  mcb({ id: "havells-32a-dp-mcb", brand: "Havells", poles: "DP", curve: "C", price: 640, mrp: 905, rating: 4.6, reviews: 388, delivery: "Today", freeDelivery: false, group: "havells-32a-c" }),
+  mcb({ id: "havells-32a-tp-mcb", brand: "Havells", poles: "TP", curve: "C", price: 1020, mrp: 1450, rating: 4.7, reviews: 214, delivery: "Tomorrow", freeDelivery: true, group: "havells-32a-c" }),
+  mcb({ id: "havells-32a-tpn-mcb", brand: "Havells", poles: "TPN", curve: "C", price: 1480, mrp: 2090, rating: 4.6, reviews: 97, delivery: "In 3 days", freeDelivery: true, group: "havells-32a-c", stock: "out" }),
+  mcb({ id: "schneider-32a-sp-mcb", brand: "Schneider Electric", poles: "SP", curve: "C", price: 315, mrp: 440, rating: 4.7, reviews: 931, delivery: "Tomorrow", freeDelivery: false }),
+  mcb({ id: "legrand-32a-sp-b-mcb", brand: "Legrand", poles: "SP", curve: "B", price: 298, mrp: 420, rating: 4.5, reviews: 402, delivery: "Tomorrow", freeDelivery: false }),
+  mcb({ id: "lt-32a-dp-mcb", brand: "L&T", poles: "DP", curve: "C", price: 695, mrp: 980, rating: 4.6, reviews: 276, delivery: "In 2 days", freeDelivery: true }),
   p({
     id: "philips-20w-batten",
     brand: "Philips",
@@ -730,6 +813,8 @@ export const brands = [
   "Astral",
   "SKF",
   "Godrej",
+  "Schneider Electric",
+  "L&T",
 ];
 
 export const discount = (product: Product) => Math.round(((product.mrp - product.price) / product.mrp) * 100);

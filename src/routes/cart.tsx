@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { inr, productById } from "@/lib/skycart-data";
 import { DeliveryLine, ProductTile } from "@/components/skycart/ProductCard";
-import { Badge, EmptyState, PillButton, QuantityStepper } from "@/components/skycart/primitives";
+import { EmptyState, PillButton, QuantityStepper } from "@/components/skycart/primitives";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -19,7 +19,7 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { detailed, saved, totals, setQty, remove, saveForLater, moveToCart } = useCart();
+  const { detailed, saved, totals, count, setQty, remove, saveForLater, moveToCart } = useCart();
   const navigate = useNavigate();
   const [priceNoticeDismissed, setPriceNoticeDismissed] = useState(false);
 
@@ -49,7 +49,7 @@ function CartPage() {
       </p>
 
       {!priceNoticeDismissed ? (
-        <div className="surface-card mt-4 flex flex-col gap-3 border-warning/40 bg-warning/10 p-4 md:flex-row md:items-center md:justify-between">
+        <div className="surface-card mt-4 flex flex-col gap-3 border-warning/40 bg-warning/10 p-4">
           <p className="flex items-start gap-2 text-sm">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning-foreground" />
             <span>
@@ -63,50 +63,47 @@ function CartPage() {
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[minmax(0,1fr)_368px]">
+      <div className="mt-5 space-y-5">
         <div className="space-y-3">
           {detailed.map(({ product, qty }) => (
-            <article key={product.id} className="surface-card grid gap-4 p-4 sm:grid-cols-[112px_minmax(0,1fr)_auto]">
-              <Link to="/product/$id" params={{ id: product.id }}>
-                <ProductTile product={product} className="aspect-square w-full" />
+            <article key={product.id} className="surface-card flex gap-3 p-3">
+              <Link to="/product/$id" params={{ id: product.id }} className="h-[88px] w-[88px] shrink-0">
+                <ProductTile product={product} className="h-[88px] w-[88px]" />
               </Link>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {product.brand}
                 </p>
                 <Link
                   to="/product/$id"
                   params={{ id: product.id }}
-                  className="mt-1 block text-[15px] font-semibold leading-snug hover:text-primary"
+                  className="mt-0.5 line-clamp-2 block text-[14px] font-semibold leading-snug"
                 >
                   {product.name}
                 </Link>
-                <p className="mt-1 text-[13px] text-muted-foreground">{product.specLine}</p>
-                <div className="mt-2">
+                <p className="mt-0.5 truncate text-[12px] text-muted-foreground">{product.specLine}</p>
+                <div className="mt-1.5">
                   <DeliveryLine product={product} />
                 </div>
-                <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <QuantityStepper qty={qty} onChange={(n) => setQty(product.id, n)} />
-                  <button
-                    onClick={() => saveForLater(product.id)}
-                    className="text-[13px] font-semibold text-primary hover:underline"
-                  >
-                    Save for later
-                  </button>
-                  <button
-                    onClick={() => remove(product.id)}
-                    className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" /> Remove
-                  </button>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="font-display text-base font-bold">{inr(product.price * qty)}</span>
+                  <span className="text-[12px] text-muted-foreground line-through">{inr(product.mrp * qty)}</span>
                 </div>
-              </div>
-              <div className="text-left sm:text-right">
-                <p className="font-display text-lg font-bold">{inr(product.price * qty)}</p>
-                <p className="text-[13px] text-muted-foreground line-through">{inr(product.mrp * qty)}</p>
-                <Badge tone="success" className="mt-1">
-                  Saving {inr((product.mrp - product.price) * qty)}
-                </Badge>
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <QuantityStepper qty={qty} onChange={(n) => setQty(product.id, n)} />
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => saveForLater(product.id)} className="text-[12px] font-semibold text-primary">
+                      Save for later
+                    </button>
+                    <button
+                      onClick={() => remove(product.id)}
+                      aria-label={`Remove ${product.name}`}
+                      className="text-muted-foreground active:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </article>
           ))}
@@ -136,39 +133,42 @@ function CartPage() {
           ) : null}
         </div>
 
-        <aside className="lg:sticky lg:top-32 lg:self-start">
-          <div className="surface-card p-5">
-            <h2 className="text-base font-bold">Order summary</h2>
-            <dl className="mt-4 space-y-2.5 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Subtotal</dt>
-                <dd className="font-semibold">{inr(totals.subtotal)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Discount</dt>
-                <dd className="font-semibold text-success">− {inr(totals.discount)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Delivery</dt>
-                <dd className="font-semibold">{totals.delivery === 0 ? "Free" : inr(totals.delivery)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">GST (18%)</dt>
-                <dd className="font-semibold">{inr(totals.gst)}</dd>
-              </div>
-              <div className="flex justify-between border-t border-border pt-3 text-base">
-                <dt className="font-bold">Total</dt>
-                <dd className="font-display font-extrabold">{inr(totals.total)}</dd>
-              </div>
-            </dl>
-            <PillButton className="mt-5 w-full" size="lg" onClick={() => navigate({ to: "/checkout" })}>
-              Checkout
-            </PillButton>
-            <p className="mt-3 text-[12px] text-muted-foreground">
-              GST invoice issued to your registered business details.
+        <section className="surface-card p-5">
+          <h2 className="text-base font-bold">Order summary</h2>
+          <dl className="mt-4 space-y-2.5 text-sm">
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">Subtotal</dt>
+              <dd className="font-semibold">{inr(totals.subtotal)}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-muted-foreground">Delivery</dt>
+              <dd className="font-semibold">{totals.allFree ? "Free delivery" : inr(totals.delivery)}</dd>
+            </div>
+            <div className="flex justify-between border-t border-border pt-3 text-base">
+              <dt className="font-bold">Total</dt>
+              <dd className="font-display font-extrabold">{inr(totals.total)}</dd>
+            </div>
+          </dl>
+          <p className="mt-1.5 text-[12px] text-muted-foreground">Includes {inr(totals.gstIncluded)} GST</p>
+          {totals.savings > 0 ? (
+            <p className="mt-2 text-[13px] font-semibold text-success">You save {inr(totals.savings)} on MRP</p>
+          ) : null}
+          <p className="mt-3 text-[12px] text-muted-foreground">GST invoice issued to your registered business details.</p>
+        </section>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] border-t border-border bg-card px-4 pb-5 pt-3">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="font-display text-lg font-extrabold leading-tight">{inr(totals.total)}</p>
+            <p className="truncate text-[12px] text-muted-foreground">
+              {count} item{count === 1 ? "" : "s"} · incl. GST
             </p>
           </div>
-        </aside>
+          <PillButton size="lg" onClick={() => navigate({ to: "/checkout" })}>
+            Checkout →
+          </PillButton>
+        </div>
       </div>
     </div>
   );

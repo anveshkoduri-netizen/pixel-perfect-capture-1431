@@ -18,12 +18,14 @@ type CartState = {
   clear: () => void;
   count: number;
   detailed: Array<{ product: Product; qty: number }>;
-  totals: { subtotal: number; mrpTotal: number; discount: number; delivery: number; gst: number; total: number };
+  totals: { subtotal: number; mrpTotal: number; savings: number; delivery: number; allFree: boolean; gstIncluded: number; total: number };
 };
 
 const CartContext = createContext<CartState | null>(null);
 
 const STORAGE_KEY = "skycart.cart.v1";
+/** Per-line delivery charge for products without free delivery; shown on cards, PDP and cart lines. */
+export const DELIVERY_FEE = 99;
 
 const seedLines: CartLine[] = [
   { id: "polycab-2-5-fr-wire", qty: 2 },
@@ -115,17 +117,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const totals = useMemo(() => {
+    // Listed prices already include 18% GST.
     const subtotal = detailed.reduce((sum, l) => sum + l.product.price * l.qty, 0);
     const mrpTotal = detailed.reduce((sum, l) => sum + l.product.mrp * l.qty, 0);
-    const delivery = subtotal === 0 || subtotal > 5000 ? 0 : 99;
-    const gst = Math.round(subtotal * 0.18);
+    const paidLines = detailed.filter((l) => !l.product.freeDelivery);
+    const delivery = paidLines.length * DELIVERY_FEE;
+    const total = subtotal + delivery;
     return {
       subtotal,
       mrpTotal,
-      discount: mrpTotal - subtotal,
+      savings: mrpTotal - subtotal,
       delivery,
-      gst,
-      total: subtotal + delivery + gst,
+      allFree: paidLines.length === 0,
+      gstIncluded: Math.round((total * 18) / 118),
+      total,
     };
   }, [detailed]);
 

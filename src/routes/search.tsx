@@ -3,8 +3,9 @@ import { SearchX, Sparkles, WifiOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
 import { SearchField } from "@/components/skycart/SearchField";
+import { ProductCard } from "@/components/skycart/ProductCard";
 import { ResultsView } from "@/components/skycart/ResultsView";
-import { EmptyState, PillButton, categoryIcons } from "@/components/skycart/primitives";
+import { EmptyState, PillButton, SectionHeader, categoryIcons } from "@/components/skycart/primitives";
 import { interpret, relaxedResults, searchProducts } from "@/lib/search";
 import { categories, categoryBySlug } from "@/lib/skycart-data";
 
@@ -139,7 +140,7 @@ function SearchPage() {
     );
   }
 
-  const { results, interpretation } = searchProducts(q);
+  const { results, related, interpretation } = searchProducts(q);
   const relaxed = relaxedResults(interpretation);
   const relaxedQuery = interpretation.tokens.find((t) => t.kind !== "Product type")?.value;
   const category = interpretation.category ? categoryBySlug(interpretation.category) : undefined;
@@ -187,6 +188,16 @@ function SearchPage() {
           </EmptyState>
         }
       />
+      {!loading && results.length > 0 && related.length > 0 ? (
+        <section className="container-page mt-10">
+          <SectionHeader eyebrow="Doesn't match every spec" title="You may also need" />
+          <div className="grid grid-cols-2 gap-3">
+            {related.map((item) => (
+              <ProductCard key={item.id} product={item} />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </>
   );
 }

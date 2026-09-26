@@ -56,7 +56,8 @@ function CheckoutPage() {
   const [paymentFailed, setPaymentFailed] = useState(false);
 
   const deliveryFee = delivery === "express" ? 249 : totals.delivery;
-  const total = totals.subtotal + totals.gst + deliveryFee;
+  const total = totals.subtotal + deliveryFee;
+  const gstIncluded = Math.round((total * 18) / 118);
 
   const validateAddress = () => {
     const issues: string[] = [];
@@ -311,14 +312,14 @@ function CheckoutPage() {
                     <dt className="text-muted-foreground">Delivery</dt>
                     <dd className="font-semibold">{deliveryFee === 0 ? "Free" : inr(deliveryFee)}</dd>
                   </div>
-                  <div className="flex justify-between">
-                    <dt className="text-muted-foreground">GST (18%)</dt>
-                    <dd className="font-semibold">{inr(totals.gst)}</dd>
-                  </div>
                   <div className="flex justify-between border-t border-border pt-3 text-base">
                     <dt className="font-bold">Total</dt>
                     <dd className="font-display font-extrabold">{inr(total)}</dd>
                   </div>
+                  <p className="text-[12px] text-muted-foreground">Includes {inr(gstIncluded)} GST</p>
+                  {totals.savings > 0 ? (
+                    <p className="text-[13px] font-semibold text-success">You save {inr(totals.savings)} on MRP</p>
+                  ) : null}
                 </dl>
                 {step === 1 ? (
                   <div className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[430px] border-t border-border bg-card px-4 pb-5 pt-3">
