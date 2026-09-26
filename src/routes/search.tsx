@@ -181,7 +181,7 @@ function SearchPage() {
                 All {category.name} · {category.count.toLocaleString("en-IN")} products
               </PillButton>
             ) : null}
-            <PillButton onClick={() => navigate({ to: "/search", search: { q: products[0].brand } })}>
+            <PillButton onClick={() => navigate({ to: "/search", search: { q: q.split(" ").slice(-1).join(" ") } })}>
               Closest matches
             </PillButton>
           </EmptyState>
