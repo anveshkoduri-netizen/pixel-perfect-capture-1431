@@ -170,7 +170,6 @@ function CartPage() {
           </PillButton>
         </div>
       </div>
-      </div>
     </div>
   );
 }

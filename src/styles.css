@@ -29,6 +29,7 @@
 
   --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -169,4 +170,19 @@
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body[data-dock="on"] [data-bottom-nav] {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-bottom-nav] {
+  transition: transform 200ms ease, opacity 200ms ease;
 }
