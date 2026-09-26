@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { inr, productById } from "@/lib/skycart-data";
 import { DeliveryLine, ProductTile } from "@/components/skycart/ProductCard";
-import { EmptyState, PillButton, QuantityStepper } from "@/components/skycart/primitives";
+import { EmptyState, PillButton, QuantityStepper, plural } from "@/components/skycart/primitives";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({

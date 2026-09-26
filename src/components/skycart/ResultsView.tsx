@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Grid2x2, LayoutList, SlidersHorizontal, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import { categoryBySlug, filterProducts, type Product } from "@/lib/skycart-data";
+import { filterProducts, type Product } from "@/lib/skycart-data";
 import { ProductCard } from "./ProductCard";
 import { FilterPanel, type FilterState } from "./FilterPanel";
 import { PillButton, plural } from "./primitives";

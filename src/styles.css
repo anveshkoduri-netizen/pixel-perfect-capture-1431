@@ -199,6 +199,7 @@ svg.lucide {
   stroke-width: 1.75;
 }
 
+@layer components {
 /* Chips — never dark fills */
 .chip {
   -webkit-tap-highlight-color: transparent;
@@ -218,6 +219,8 @@ svg.lucide {
 }
 .chip:focus { background-clip: padding-box; }
 .chip:focus:not(:focus-visible) { outline: none; }
+
+}
 
 /* Bottom nav dock */
 .nav-dock {
