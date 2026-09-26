@@ -23,7 +23,7 @@ export type Category = {
 };
 
 export const categories: Category[] = [
-  { slug: "electrical", name: "Electrical", blurb: "MCBs, RCCBs, switches, boards", count: 18420, icon: "zap" },
+  { slug: "electrical", name: "Electrical", blurb: "MCBs, RCCBs, switches, boards", count: 4120, icon: "zap" },
   { slug: "wires-cables", name: "Wires & Cables", blurb: "FR, flexible, armoured", count: 9310, icon: "cable" },
   { slug: "lighting", name: "Lighting", blurb: "Battens, panels, floodlights", count: 12760, icon: "lightbulb" },
   { slug: "plumbing", name: "Plumbing", blurb: "Pipes, fittings, valves", count: 15240, icon: "droplets" },
