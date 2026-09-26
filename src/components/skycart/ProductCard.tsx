@@ -6,7 +6,7 @@ import { useCart } from "@/lib/cart";
 import { discount, inr, type Product } from "@/lib/skycart-data";
 import { Badge, PillButton, categoryIcons } from "./primitives";
 
-export function ProductTile({ product, className }: { product: Product; className?: string }) {
+export function ProductTile({ product, className }: { product: Product; className?: string | undefined }) {
   const Icon = categoryIcons[product.category];
   return (
     <div
@@ -23,7 +23,7 @@ export function ProductTile({ product, className }: { product: Product; classNam
   );
 }
 
-export function PriceBlock({ product, size = "md" }: { product: Product; size?: "md" | "lg" }) {
+export function PriceBlock({ product, size = "md" }: { product: Product; size?: "md" | "lg" | undefined }) {
   return (
     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
       <span className={cn("font-display font-bold tracking-tight", size === "lg" ? "text-3xl" : "text-lg")}>
@@ -63,7 +63,7 @@ export function Rating({ product }: { product: Product }) {
   );
 }
 
-export function ProductCard({ product, layout = "grid" }: { product: Product; layout?: "grid" | "list" }) {
+export function ProductCard({ product, layout = "grid" }: { product: Product; layout?: "grid" | "list" | undefined }) {
   const { add, toggleWishlist, wishlist } = useCart();
   const wished = wishlist.includes(product.id);
 

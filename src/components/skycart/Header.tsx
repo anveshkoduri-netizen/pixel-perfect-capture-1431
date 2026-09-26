@@ -121,7 +121,7 @@ export function BottomNav() {
               <Link
                 key={destination.to}
                 to={destination.to}
-                search={destination.to === "/search" ? { q: "" } : undefined}
+                search={destination.to === "/search" ? { q: "" } : {}}
                 className={cn(
                   "flex flex-1 flex-col items-center gap-0.5 rounded-full px-2 py-2 text-[11px] font-semibold transition-colors",
                   active ? "bg-primary-container text-primary" : "text-muted-foreground",

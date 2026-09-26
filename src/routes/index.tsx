@@ -57,7 +57,7 @@ function Rail({
   title,
   items,
 }: {
-  eyebrow?: string;
+  eyebrow?: string | undefined;
   title: string;
   items: typeof products;
 }) {

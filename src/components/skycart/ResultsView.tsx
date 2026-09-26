@@ -40,12 +40,12 @@ export function ResultsView({
   emptyState,
 }: {
   results: Product[];
-  categoryName?: string;
-  categorySlug?: string;
-  breadcrumb: Array<{ label: string; to?: string }>;
+  categoryName?: string | undefined;
+  categorySlug?: string | undefined;
+  breadcrumb: Array<{ label: string; to?: string | undefined }>;
   heading: string;
   subheading?: React.ReactNode;
-  loading?: boolean;
+  loading?: boolean | undefined;
   interpretation?: React.ReactNode;
   emptyState?: React.ReactNode;
 }) {

@@ -24,8 +24,8 @@ const typeMap: Array<{ words: string[]; type: string; category: CategorySlug }> 
 
 export type Interpretation = {
   tokens: Token[];
-  category?: CategorySlug;
-  brand?: string;
+  category?: CategorySlug | undefined;
+  brand?: string | undefined;
 };
 
 export function interpret(query: string): Interpretation {
@@ -63,12 +63,12 @@ export function interpret(query: string): Interpretation {
   }
 
   const brand = [...new Set(products.map((x) => x.brand))].find((b) =>
-    q.includes(b.toLowerCase().split(" ")[0]),
+    q.includes(b.toLowerCase().split(" ")[0] ?? b.toLowerCase()),
   );
   if (brand) tokens.push({ value: brand, kind: "Brand" });
 
   if (!category) {
-    const cat = categories.find((c) => q.includes(c.name.toLowerCase().split(" ")[0]));
+    const cat = categories.find((c) => q.includes(c.name.toLowerCase().split(" ")[0] ?? c.name.toLowerCase()));
     if (cat) category = cat.slug;
   }
 

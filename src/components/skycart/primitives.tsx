@@ -63,7 +63,7 @@ export function Chip({
   selected,
   className,
   ...props
-}: ComponentProps<"button"> & { selected?: boolean }) {
+}: ComponentProps<"button"> & { selected?: boolean | undefined }) {
   return (
     <button
       className={cn(
@@ -84,8 +84,8 @@ export function Badge({
   className,
 }: {
   children: ReactNode;
-  tone?: "neutral" | "primary" | "success" | "warning" | "danger";
-  className?: string;
+  tone?: "neutral" | "primary" | "success" | "warning" | "danger" | undefined;
+  className?: string | undefined;
 }) {
   return (
     <span
@@ -110,10 +110,10 @@ export function SectionHeader({
   action,
   to,
 }: {
-  eyebrow?: string;
+  eyebrow?: string | undefined;
   title: string;
-  action?: string;
-  to?: string;
+  action?: string | undefined;
+  to?: string | undefined;
 }) {
   return (
     <div className="mb-4 flex items-end justify-between gap-4">

@@ -11,11 +11,11 @@ export function SearchField({
   autoFocus = false,
   className,
 }: {
-  size?: "md" | "lg";
-  initialQuery?: string;
-  showExamples?: boolean;
-  autoFocus?: boolean;
-  className?: string;
+  size?: "md" | "lg" | undefined;
+  initialQuery?: string | undefined;
+  showExamples?: boolean | undefined;
+  autoFocus?: boolean | undefined;
+  className?: string | undefined;
 }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState(initialQuery);

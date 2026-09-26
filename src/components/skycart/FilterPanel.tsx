@@ -16,8 +16,8 @@ export function FilterPanel({
   onToggle,
   onClear,
 }: {
-  categoryName?: string;
-  categorySlug?: string;
+  categoryName?: string | undefined;
+  categorySlug?: string | undefined;
   state: FilterState;
   onToggle: (group: string, option: string) => void;
   onClear: () => void;
