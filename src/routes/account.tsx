@@ -28,6 +28,8 @@ export const Route = createFileRoute("/account")({
       },
       { property: "og:title", content: "Your account — SKYCART" },
       { property: "og:description", content: "Orders, wishlist, addresses, payments and business details." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AccountPage,

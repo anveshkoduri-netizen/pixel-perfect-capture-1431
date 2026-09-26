@@ -1,4 +1,4 @@
-- [x] Swap product bottom navigation for a 200ms, reduced-motion-aware purchase bar after the main Add to cart button leaves view; restore nav when it returns.
-- [x] Show eight complete category tiles and an All 14 tile in a four-column home grid at phone widths.
-- [x] Use catalogue display names in department breadcrumbs.
-- [x] Verify the interactions and layout at 360, 390, and 430px.
+- [x] Preselect interpreted search specifications and let filter chips change search results.
+- [x] Show catalogue-derived filter values, live per-value counts, and zero-result feedback.
+- [x] Simplify the filter sheet and add a sticky live-result footer.
+- [x] Verify search and category filter interactions on phone widths.

@@ -15,6 +15,8 @@ export const Route = createFileRoute("/checkout")({
       { name: "robots", content: "noindex" },
       { property: "og:title", content: "Checkout — SKYCART" },
       { property: "og:description", content: "Confirm address, delivery and payment." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CheckoutPage,

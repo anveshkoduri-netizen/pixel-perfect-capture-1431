@@ -11,6 +11,8 @@ export const Route = createFileRoute("/orders")({
       { name: "description", content: "Track SKYCART orders, delivery status and GST invoices for your business." },
       { property: "og:title", content: "Your orders — SKYCART" },
       { property: "og:description", content: "Track orders, delivery status and invoices." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: OrdersPage,

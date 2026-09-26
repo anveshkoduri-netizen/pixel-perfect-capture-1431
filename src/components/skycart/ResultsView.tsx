@@ -2,9 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { Grid2x2, LayoutList, SlidersHorizontal, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
-import type { Product } from "@/lib/skycart-data";
+import { categoryBySlug, filterProducts, type Product } from "@/lib/skycart-data";
 import { ProductCard } from "./ProductCard";
 import { FilterPanel, type FilterState } from "./FilterPanel";
+import { PillButton } from "./primitives";
 
 export type SortKey = "relevance" | "price-asc" | "price-desc" | "rating" | "discount";
 
@@ -30,6 +31,8 @@ export function ResultCardSkeleton() {
 
 export function ResultsView({
   results,
+  facetCatalogue,
+  initialFilters = {},
   categoryName,
   categorySlug,
   breadcrumb,
@@ -40,6 +43,8 @@ export function ResultsView({
   emptyState,
 }: {
   results: Product[];
+  facetCatalogue?: Product[] | undefined;
+  initialFilters?: FilterState | undefined;
   categoryName?: string | undefined;
   categorySlug?: string | undefined;
   breadcrumb: Array<{ label: string; to?: string | undefined }>;
@@ -49,7 +54,7 @@ export function ResultsView({
   interpretation?: React.ReactNode;
   emptyState?: React.ReactNode;
 }) {
-  const [filters, setFilters] = useState<FilterState>({});
+  const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [sort, setSort] = useState<SortKey>("relevance");
   const [layout, setLayout] = useState<"grid" | "list">("grid");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -63,46 +68,24 @@ export function ResultsView({
       };
     });
 
+  const catalogue = facetCatalogue ?? results;
   const filtered = useMemo(() => {
-    const active = Object.entries(filters).filter(([, v]) => v.length > 0);
-    let list = results;
-    for (const [group, options] of active) {
-      list = list.filter((product) => {
-        const haystack = `${product.brand} ${product.name} ${product.specLine} ${product.specs
-          .map((s) => s.value)
-          .join(" ")} ${product.stock === "in" ? "In stock" : ""} ${
-          product.freeDelivery ? "Free delivery" : ""
-        } ${product.delivery === "Tomorrow" ? "Delivery tomorrow" : ""}`.toLowerCase();
-        if (group === "Price") {
-          return options.some((band) => {
-            if (band.startsWith("Under")) return product.price < 500;
-            if (band.startsWith("₹500")) return product.price >= 500 && product.price <= 2000;
-            if (band.startsWith("₹2,000")) return product.price > 2000 && product.price <= 10000;
-            return product.price > 10000;
-          });
-        }
-        if (group === "Rating") {
-          return options.some((option) => product.rating >= parseFloat(option));
-        }
-        return options.some((option) => haystack.includes(option.toLowerCase()));
-      });
-    }
-    const sorted = [...list];
+    const sorted = [...filterProducts(catalogue, filters)];
     if (sort === "price-asc") sorted.sort((a, b) => a.price - b.price);
     if (sort === "price-desc") sorted.sort((a, b) => b.price - a.price);
     if (sort === "rating") sorted.sort((a, b) => b.rating - a.rating);
     if (sort === "discount")
       sorted.sort((a, b) => (b.mrp - b.price) / b.mrp - (a.mrp - a.price) / a.mrp);
     return sorted;
-  }, [filters, results, sort]);
+  }, [filters, catalogue, sort]);
 
   const panel = (
     <FilterPanel
       categoryName={categoryName}
       categorySlug={categorySlug}
+      catalogue={catalogue}
       state={filters}
       onToggle={toggle}
-      onClear={() => setFilters({})}
     />
   );
 
@@ -173,12 +156,8 @@ export function ResultsView({
 
       {interpretation}
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[272px_minmax(0,1fr)]">
-        <aside className="hidden lg:block">
-          <div className="sticky top-32">{panel}</div>
-        </aside>
-
-        <div>
+       <div className="mt-5">
+         <div>
           <p className="mb-3 text-[13px] text-muted-foreground">
             {loading ? "Searching the catalogue…" : `${filtered.length} products`}
           </p>
@@ -226,24 +205,26 @@ export function ResultsView({
             onClick={() => setMobileFiltersOpen(false)}
             aria-hidden
           />
-          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-background p-4">
-            <div className="mb-3 flex items-center justify-between">
+          <div role="dialog" aria-modal="true" aria-label="Filters" className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col overflow-hidden rounded-t-2xl bg-background">
+            <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
               <h2 className="text-lg font-bold">Filters</h2>
-              <button
-                aria-label="Close filters"
-                onClick={() => setMobileFiltersOpen(false)}
-                className="grid h-9 w-9 place-items-center rounded-full border border-border bg-card"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex items-center gap-2">
+                {Object.values(filters).some((values) => values.length > 0) && (
+                  <PillButton variant="ghost" size="sm" onClick={() => setFilters({})}>Clear all</PillButton>
+                )}
+                <PillButton variant="secondary" size="sm" aria-label="Close filters" onClick={() => setMobileFiltersOpen(false)} className="h-9 w-9 p-0">
+                  <X className="h-4 w-4" />
+                </PillButton>
+              </div>
             </div>
-            {panel}
-            <button
-              onClick={() => setMobileFiltersOpen(false)}
-              className="mt-4 h-12 w-full rounded-full bg-primary text-sm font-semibold text-primary-foreground"
-            >
-              Show {filtered.length} products
-            </button>
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">{panel}</div>
+            <div className="flex shrink-0 items-center justify-between gap-2 border-t border-border bg-card px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+              <p className="min-w-0 text-[12px] text-muted-foreground">
+                <strong className="text-foreground">{filtered.length} products</strong>
+                {categorySlug && categoryBySlug(categorySlug) ? ` · of ${categoryBySlug(categorySlug)?.count.toLocaleString("en-IN")} in ${categoryName ?? categoryBySlug(categorySlug)?.name}` : " in the catalogue"}
+              </p>
+              <PillButton className="shrink-0" onClick={() => setMobileFiltersOpen(false)}>Show {filtered.length}</PillButton>
+            </div>
           </div>
         </div>
       ) : null}

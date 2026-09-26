@@ -23,7 +23,7 @@ export type Category = {
 };
 
 export const categories: Category[] = [
-  { slug: "electrical", name: "Electrical", blurb: "MCBs, RCCBs, switches, boards", count: 18420, icon: "zap" },
+  { slug: "electrical", name: "Electrical", blurb: "MCBs, RCCBs, switches, boards", count: 4120, icon: "zap" },
   { slug: "wires-cables", name: "Wires & Cables", blurb: "FR, flexible, armoured", count: 9310, icon: "cable" },
   { slug: "lighting", name: "Lighting", blurb: "Battens, panels, floodlights", count: 12760, icon: "lightbulb" },
   { slug: "plumbing", name: "Plumbing", blurb: "Pipes, fittings, valves", count: 15240, icon: "droplets" },
@@ -834,9 +834,10 @@ export const filterGroupsByCategory: Record<string, Array<{ label: string; optio
     { label: "Application", options: ["Masonry", "Metal", "Wood"] },
   ],
   electrical: [
-    { label: "Brand", options: ["Havells", "Legrand", "Schneider", "Anchor"] },
+    { label: "Brand", options: ["Havells", "Legrand", "Schneider Electric", "L&T", "Anchor"] },
     { label: "Product type", options: ["MCB", "RCCB", "Switch", "Distribution board"] },
     { label: "Current", options: ["6 A", "16 A", "32 A", "63 A"] },
+    { label: "Curve", options: ["B", "C", "D"] },
     { label: "Voltage", options: ["240 V", "415 V"] },
     { label: "Poles", options: ["SP", "DP", "TP", "TPN"] },
     { label: "Rating", options: ["6 kA", "10 kA"] },
@@ -884,3 +885,60 @@ export const defaultFilterGroups = [
 ];
 
 export const priceBands = ["Under ₹500", "₹500 – ₹2,000", "₹2,000 – ₹10,000", "Above ₹10,000"];
+
+/** The local catalogue is the source of truth for facets and their counts. */
+export function filterGroupsFor(categorySlug: string | undefined, catalogue: Product[]) {
+  const configured = filterGroupsByCategory[categorySlug ?? ""] ?? defaultFilterGroups;
+  return [...configured, { label: "Price", options: priceBands }].map((group) => {
+    const actual = group.label === "Brand"
+      ? [...new Set(catalogue.map((p) => p.brand))]
+      : group.label === "Curve"
+        ? [...new Set(catalogue.flatMap((p) => p.specs.filter((s) => s.label === "Curve").map((s) => s.value)))]
+        : group.label === "Product type" && categorySlug === "electrical"
+          ? [...new Set(catalogue.map((p) => /\bMCB\b/i.test(p.name) ? "MCB" : /\bswitch\b/i.test(p.name) ? "Switch" : "").filter(Boolean))]
+          : [];
+    return { label: group.label, options: group.label === "Brand" ? actual : [...new Set([...actual, ...group.options])] };
+  });
+}
+
+const normalized = (value: string) => value.toLowerCase().replace(/\s+/g, "").replace(/[^a-z0-9.]/g, "");
+
+export function productMatchesFacet(product: Product, group: string, option: string): boolean {
+  const specs = product.specs;
+  const specMatches = (labels: string[]) => specs.some((s) => labels.includes(s.label) && normalized(s.value) === normalized(option));
+  const text = `${product.name} ${product.specLine}`.toLowerCase();
+  if (group === "Brand") return product.brand === option;
+  if (group === "Price") {
+    if (option === priceBands[0]) return product.price < 500;
+    if (option === priceBands[1]) return product.price >= 500 && product.price <= 2000;
+    if (option === priceBands[2]) return product.price > 2000 && product.price <= 10000;
+    return product.price > 10000;
+  }
+  if (group === "Rating" && option.includes("above")) return product.rating >= Number.parseFloat(option);
+  if (group === "Availability") {
+    if (option === "In stock") return product.stock !== "out";
+    if (option === "Delivery tomorrow") return product.delivery === "Tomorrow";
+    return product.freeDelivery;
+  }
+  if (group === "Product type" || group === "Tool type" || group === "Cable type") {
+    return new RegExp(`\\b${option.toLowerCase()}\\b`).test(text) ||
+      (option === "Drill" && /drill/.test(text)) || (option === "Wire" && /wire|cable/.test(text));
+  }
+  if (group === "Poles") {
+    return specMatches(["Poles"]) || new RegExp(`\\b${option.toLowerCase()}\\b`).test(product.specLine.toLowerCase());
+  }
+  if (group === "Current") return specMatches(["Current rating"]);
+  if (group === "Size") return specMatches(["Cable size", "Size"]);
+  if (group === "Rating") return specMatches(["Breaking capacity"]);
+  if (group === "Curve") return specMatches(["Curve"]);
+  if (group === "Voltage") return specMatches(["Voltage", "Rated voltage"]) ||
+    product.glanceStats?.some((s) => s.label === "Rated voltage" && normalized(s.value) === normalized(option)) === true;
+  if (specMatches([group, group === "Core" ? "Cores" : group])) return true;
+  return text.includes(option.toLowerCase());
+}
+
+export function filterProducts(catalogue: Product[], filters: Record<string, string[]>) {
+  return catalogue.filter((product) => Object.entries(filters).every(([group, options]) =>
+    options.length === 0 || options.some((option) => productMatchesFacet(product, group, option))
+  ));
+}

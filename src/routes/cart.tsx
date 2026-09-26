@@ -13,6 +13,8 @@ export const Route = createFileRoute("/cart")({
       { name: "description", content: "Review quantities, delivery dates and GST before checkout on SKYCART." },
       { property: "og:title", content: "Your cart — SKYCART" },
       { property: "og:description", content: "Review quantities, delivery dates and GST before checkout." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CartPage,

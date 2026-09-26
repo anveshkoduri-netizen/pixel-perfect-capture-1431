@@ -14,6 +14,8 @@ export const Route = createFileRoute("/categories")({
       },
       { property: "og:title", content: "All categories — SKYCART" },
       { property: "og:description", content: "Browse every SKYCART supply category by specification." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CategoriesPage,
