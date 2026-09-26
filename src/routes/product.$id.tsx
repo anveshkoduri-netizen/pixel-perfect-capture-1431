@@ -439,6 +439,7 @@ function PurchaseDock({
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0",
       )}
       aria-hidden={!show}
+       inert={!show}
     >
        <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2">
         <div className="min-w-0 flex-1">
