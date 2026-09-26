@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/lib/cart";
 import { discount, inr, productById, products } from "@/lib/skycart-data";
+import { productGallery } from "@/lib/product-images";
 import {
   DeliveryLine,
   PriceBlock,
@@ -58,6 +59,9 @@ function ProductPage() {
     setActiveImage(0);
   }, [product.id, markViewed]);
 
+  const gallery = productGallery(product.id);
+  const glanceStats = product.glanceStats ?? product.specs.slice(0, 4).map((x) => ({ value: x.value, label: x.label }));
+  const variants = product.variant ? products.filter((x) => x.variant?.group === product.variant?.group) : [];
   const deliverable = checkedPincode ? pincodes[checkedPincode] !== false : true;
   const related = products.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 4);
   const alsoViewed = products.filter((p) => p.id !== product.id && p.category !== product.category).slice(0, 4);
@@ -103,29 +107,60 @@ function ProductPage() {
       <div className="mt-5 flex flex-col gap-5 [&_section.mt-5]:mt-0 [&>div>.mt-5]:mt-0">
         <div className="contents">
           <div className="surface-card order-[-2] p-4">
-            <ProductTile product={product} className="aspect-[4/3] w-full" />
-            <div className="mt-3 flex gap-2">
-              {[0, 1, 2, 3].map((index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveImage(index)}
-                  aria-label={`View ${index + 1}`}
-                  className={cn(
-                    "h-16 w-16 overflow-hidden rounded-lg border transition-colors",
-                    activeImage === index ? "border-primary" : "border-border",
-                  )}
-                >
-                  <ProductTile product={product} className="h-full w-full" />
-                </button>
-              ))}
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-soft">
+              {gallery[activeImage] ? (
+                <img
+                  src={gallery[activeImage].src}
+                  alt={`${product.brand} ${product.name} — ${gallery[activeImage].label}`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <ProductTile product={product} className="h-full w-full" />
+              )}
+              <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+                {(product.callouts ?? product.specs.slice(0, 3).map((x) => x.value)).slice(0, 3).map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 py-1 font-mono text-[11px] font-bold shadow-sm"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
+            {gallery.length > 1 ? (
+              <div className="mt-3 flex gap-2">
+                {gallery.map((view, index) => (
+                  <button
+                    key={view.label}
+                    onClick={() => setActiveImage(index)}
+                    aria-label={`View ${view.label}`}
+                    className={cn(
+                      "h-16 w-16 overflow-hidden rounded-lg border-2 transition-colors",
+                      activeImage === index ? "border-primary" : "border-transparent",
+                    )}
+                  >
+                    <img src={view.src} alt="" loading="lazy" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <section className="surface-card mt-5 p-5">
             <h2 className="text-lg font-bold">At a glance</h2>
-            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="mt-3 grid grid-cols-2 gap-2.5">
+              {glanceStats.map((stat) => (
+                <div key={stat.label} className="rounded-xl bg-surface-soft p-3.5">
+                  <p className="font-mono text-[26px] font-bold leading-none tracking-tight">{stat.value}</p>
+                  <p className="mt-1.5 text-[12px] text-muted-foreground">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+            <ul className="mt-4 space-y-2">
               {product.glance.map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm">
+                <li key={item} className="flex items-start gap-2 text-[13px]">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   {item}
                 </li>
@@ -219,6 +254,35 @@ function ProductPage() {
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{product.brand}</p>
             <h1 className="mt-1.5 text-[22px] font-extrabold leading-tight">{product.name}</h1>
             <p className="mt-2 text-[13px] text-muted-foreground">{product.specLine}</p>
+            {product.variant && variants.length > 1 ? (
+              <div className="mt-4">
+                <p className="text-[13px] font-semibold">
+                  {product.variant.axis}: <span className="text-muted-foreground">{product.variant.label}</span>
+                </p>
+                <div className="no-scrollbar -mx-1 mt-2 flex gap-2 overflow-x-auto px-1">
+                  {variants.map((v) => {
+                    const selected = v.id === product.id;
+                    const out = v.stock === "out";
+                    return (
+                      <button
+                        key={v.id}
+                        disabled={out}
+                        aria-pressed={selected}
+                        onClick={() => navigate({ to: "/product/$id", params: { id: v.id }, replace: true, resetScroll: false })}
+                        className={cn(
+                          "flex shrink-0 flex-col items-start rounded-xl border px-3.5 py-2 text-left transition-colors",
+                          selected ? "border-primary bg-primary-container" : "border-border bg-card",
+                          out && "opacity-50",
+                        )}
+                      >
+                        <span className={cn("text-[13px] font-bold", selected && "text-primary")}>{v.variant?.label}</span>
+                        <span className="text-[12px] text-muted-foreground">{out ? "Out of stock" : inr(v.price)}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <Rating product={product} />
               <StockLine product={product} />
@@ -265,7 +329,7 @@ function ProductPage() {
               <QuantityStepper qty={qty} onChange={(n) => setQty(Math.max(1, n))} />
             </div>
 
-            <PurchaseDock product={product} onAdd={addToCart} disabled={product.stock === "out" || !deliverable} />
+            <PurchaseDock product={product} qty={qty} setQty={setQty} onAdd={addToCart} disabled={product.stock === "out" || !deliverable} />
             <div className="mt-4 space-y-2.5" data-purchase-cta>
               <PillButton
                 className="w-full"
@@ -335,10 +399,14 @@ function ProductPage() {
 
 function PurchaseDock({
   product,
+  qty,
+  setQty,
   onAdd,
   disabled,
 }: {
   product: { id: string; name: string; price: number };
+  qty: number;
+  setQty: (n: number) => void;
   onAdd: () => void;
   disabled: boolean;
 }) {
@@ -348,26 +416,35 @@ function PurchaseDock({
   useEffect(() => {
     const onScroll = () => {
       const el = document.querySelector("[data-purchase-cta]");
-      setShow(!!el && el.getBoundingClientRect().bottom < 0);
+      setShow(!!el && el.getBoundingClientRect().bottom < 56);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [product.id]);
+  // Swap the bottom nav out while the purchase bar is visible.
+  useEffect(() => {
+    if (show) document.body.dataset.dock = "on";
+    else delete document.body.dataset.dock;
+    return () => {
+      delete document.body.dataset.dock;
+    };
+  }, [show]);
   if (!mounted) return null;
   return createPortal(
     <div
       className={cn(
-        "fixed inset-x-0 bottom-[92px] z-40 mx-auto max-w-[430px] px-4 transition-all duration-200",
-        show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
+        "fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] border-t border-border bg-card px-4 pb-5 pt-3 transition-all duration-200",
+        show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0",
       )}
       aria-hidden={!show}
     >
-      <div className="flex items-center gap-3 rounded-full border border-border bg-card p-1.5 pl-5 shadow-nav">
+      <div className="flex items-center gap-2.5">
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[11px] text-muted-foreground">{product.name}</p>
-          <p className="font-display text-base font-extrabold">{inr(product.price)}</p>
+          <p className="font-display text-lg font-extrabold leading-tight">{inr(product.price * qty)}</p>
+          <p className="truncate text-[11px] text-muted-foreground">incl. GST</p>
         </div>
+        <QuantityStepper qty={qty} onChange={(n) => setQty(Math.max(1, n))} />
         <PillButton onClick={onAdd} disabled={disabled}>
           Add to cart
         </PillButton>
